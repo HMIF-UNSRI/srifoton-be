@@ -1,0 +1,16 @@
+# Text editor config/cache
+.idea
+.vscode
+
+# Log
+log
+*.log
+
+# Config
+.env
+
+# Binary file
+*.jpg
+*.jpeg
+*.png
+*.pdf

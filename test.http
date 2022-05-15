@@ -1,0 +1,78 @@
+### Register User Success
+POST http://localhost:8000/api/users
+Content-Type: application/json
+
+{
+  "email": "aryahmph@gmail.com",
+  "password": "H4CK3D_BY_HM1F"
+}
+
+> {%
+client.test("Register User", function() {
+  client.assert(response.status === 201);
+  client.assert(typeof response.body.data.id === "string")
+});
+%}
+
+### Register User Email Already Exist
+POST http://localhost:8000/api/users
+Content-Type: application/json
+
+{
+  "email": "aryahmph@gmail.com",
+  "password": "H4CK3D_BY_HM1F"
+}
+
+> {%
+client.test("Register User Email Already Exist", function() {
+  client.assert(response.status === 400);
+  client.assert(response.body.message === "email already exist");
+});
+%}
+
+### Register User Validation Error
+POST http://localhost:8000/api/users
+Content-Type: application/json
+
+{
+  "email": "hmifunsri@gmail.com"
+}
+
+> {%
+client.test("Register User Validation Password Required", function() {
+  client.assert(response.status === 400);
+  client.assert(response.body.errors.password === "required")
+});
+%}
+
+### Login User Success
+POST http://localhost:8000/api/auth
+Content-Type: application/json
+
+{
+  "email": "aryahmph@gmail.com",
+  "password": "H4CK3D_BY_HM1F"
+}
+
+> {%
+client.test("Login User Success", function() {
+  client.assert(response.status === 201);
+  client.assert(typeof response.body.data.access_token === "string")
+});
+%}
+
+### Login User Wrong Password
+POST http://localhost:8000/api/auth
+Content-Type: application/json
+
+{
+  "email": "aryahmph@gmail.com",
+  "password": "F0RG0T_P4SSW0RD"
+}
+
+> {%
+client.test("Login User Wrong Password", function() {
+  client.assert(response.status === 401);
+  client.assert(response.body.message === "wrong credentials")
+});
+%}
