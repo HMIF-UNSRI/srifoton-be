@@ -5,6 +5,7 @@ import (
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
+	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passwordCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	dbCommon "github.com/HMIF-UNSRI/srifoton-be/common/postgres"
 	authDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/auth/http"
@@ -21,7 +22,10 @@ func main() {
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
-
+	fmt.Println(cfg)
+	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
+		cfg.MailSmtpHost, cfg.MailSmtpPort)
+	
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
 	httpServer.Router.RedirectTrailingSlash = true
 	root := httpServer.Router.Group("/api")
