@@ -29,14 +29,19 @@ func (repository postgresUserRepositoryImpl) Insert(ctx context.Context, user us
 }
 
 func (repository postgresUserRepositoryImpl) FindByID(ctx context.Context, id string) (user userDomain.User, err error) {
-	//TODO implement me
-	panic("implement me")
+	row := repository.db.QueryRowContext(ctx, "SELECT id, email, password, role, is_email_verified FROM users WHERE id = $1 LIMIT 1;", id)
+
+	err = row.Scan(&user.ID, &user.Email, &user.Password, &user.Role, &user.IsEmailVerified)
+	if errors.Is(err, sql.ErrNoRows) {
+		return user, errorCommon.NewNotFoundError("user not found")
+	}
+	return user, err
 }
 
 func (repository postgresUserRepositoryImpl) FindByEmail(ctx context.Context, email string) (user userDomain.User, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, email, password, role FROM users WHERE email = $1 LIMIT 1;", email)
+	row := repository.db.QueryRowContext(ctx, "SELECT id, email, password, role, is_email_verified FROM users WHERE email = $1 LIMIT 1;", email)
 
-	err = row.Scan(&user.ID, &user.Email, &user.Password, &user.Role)
+	err = row.Scan(&user.ID, &user.Email, &user.Password, &user.Role, &user.IsEmailVerified)
 	if errors.Is(err, sql.ErrNoRows) {
 		return user, errorCommon.NewNotFoundError("user not found")
 	}
@@ -44,6 +49,15 @@ func (repository postgresUserRepositoryImpl) FindByEmail(ctx context.Context, em
 }
 
 func (repository postgresUserRepositoryImpl) FindAll(ctx context.Context) (users userDomain.User, err error) {
-	//TODO implement me
+	//TODO: implement me
 	panic("implement me")
+}
+
+func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET is_email_verified = true WHERE id = $1 RETURNING id;", id)
+	err = row.Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+	return id, err
 }

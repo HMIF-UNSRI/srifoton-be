@@ -9,6 +9,8 @@ type (
 		Password string
 		Role     role
 
+		IsEmailVerified bool
+
 		Timestamp
 	}
 

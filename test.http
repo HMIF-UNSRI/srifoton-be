@@ -3,7 +3,7 @@ POST http://localhost:8000/api/users
 Content-Type: application/json
 
 {
-  "email": "aryahmph@gmail.com",
+  "email": "aryayun90@gmail.com",
   "password": "H4CK3D_BY_HM1F"
 }
 
@@ -44,6 +44,11 @@ client.test("Register User Validation Password Required", function() {
   client.assert(response.body.errors.password === "required")
 });
 %}
+
+### Register Confirmation
+GET http://localhost:8000/api/users/activate
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgyZmZkZGE1LTgxYWYtNGY5NC1hNTdiLWQzMjNjMWY2ODBlOSIsImV4cCI6MTY1NTcyNjQxN30.l4niLw-YPBMEjPPQ4qYbubgywvoUkrlPjWhLieUNiE4
 
 ### Login User Success
 POST http://localhost:8000/api/auth
