@@ -1,0 +1,24 @@
+@startuml
+|Frontend|
+start
+:Form input data;
+:Validate data;
+:Send POST request;
+|Backend|
+if (Valid email and password) then (no)
+   :Error response;
+   stop
+else (yes)
+  :Generate Token;
+endif
+:Send token;
+|Frontend|
+if (Error response) then (yes)
+   :Error state form;
+   stop
+else (no)
+  :Store token in localstorage;
+endif
+  :Redirect user to dashboard;
+stop
+@enduml

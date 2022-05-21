@@ -1,0 +1,24 @@
+@startuml
+|Frontend|
+start
+:Form input data;
+:Validate data;
+:Send POST request;
+|Backend|
+if (Email and NIM already exist?) then (no)
+   :Error response;
+   stop
+else (yes)
+  :Validate data;
+endif
+:Hash password;
+:Insert data;
+:Send email activation;
+|Frontend|
+if (Error response) then (yes)
+   :Error state form;
+else (no)
+  :Tell user to activate account by email;
+endif
+stop
+@enduml
