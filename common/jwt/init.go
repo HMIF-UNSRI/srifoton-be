@@ -14,11 +14,11 @@ func NewJWTManager(accessTokenKey string) *JWTManager {
 	return &JWTManager{AccessTokenKey: []byte(accessTokenKey)}
 }
 
-func (j JWTManager) GenerateToken(id string) (string, error) {
+func (j JWTManager) GenerateToken(id string, duration time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 		id,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 24).Unix(),
+			ExpiresAt: time.Now().Add(duration).Unix(),
 		},
 	})
 
@@ -32,6 +32,5 @@ func (j JWTManager) VerifyToken(tokenString string) (string, error) {
 	}); err != nil {
 		return "", errorCommon.NewUnauthorizedError("token not valid")
 	}
-
 	return claims.ID, nil
 }

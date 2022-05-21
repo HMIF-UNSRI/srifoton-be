@@ -13,8 +13,8 @@ type MailManager struct {
 	SmtpPort int
 }
 
-func NewMailManager(email string, password string, host string, port int) MailManager {
-	return MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port}
+func NewMailManager(email string, password string, host string, port int) *MailManager {
+	return &MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port}
 }
 
 func (m MailManager) SendMail(to []string, cc []string, subject string, message string) (err error) {

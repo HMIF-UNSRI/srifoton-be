@@ -22,17 +22,16 @@ func main() {
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
-	fmt.Println(cfg)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
-	
+
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
 	httpServer.Router.RedirectTrailingSlash = true
 	root := httpServer.Router.Group("/api")
 
 	userRepository := userRepo.NewPostgresUserRepositoryImpl(db)
-	userUsecase := userUc.NewUserUsecaseImpl(userRepository, passwordManager)
-	userDelivery.NewHTTPUserDelivery(root.Group("/users"), userUsecase)
+	userUsecase := userUc.NewUserUsecaseImpl(userRepository, passwordManager, jwtManager, mailManager)
+	userDelivery.NewHTTPUserDelivery(root.Group("/users"), userUsecase, jwtManager)
 
 	authUsecase := authUc.NewAuthUsecase(userRepository, passwordManager, jwtManager)
 	authDelivery.NewHTTPAuthDelivery(root.Group("/auth"), authUsecase)
