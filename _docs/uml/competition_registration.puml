@@ -1,0 +1,21 @@
+@startuml
+|Frontend|
+start
+#Red:Validate token;
+:Form input data;
+:Validate data;
+:Send Multipart/Form-Data request;
+|Backend|
+:Validate image;
+:Store image;
+:Validate data;
+:Store data;
+:Ask admin payment approval;
+|Frontend|
+if (Error response) then (yes)
+   :Error response;
+else (no)
+  :Success response;
+endif
+stop
+@enduml
