@@ -63,6 +63,29 @@ func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid str
 	return rid, err
 }
 
+func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string) (id string, err error) {
+	user, err := usecase.userRepository.FindByEmail(ctx, email)
+	if err != nil {
+		return id, err
+	}
+
+	// Prevent sending spam emails
+	if !user.IsEmailVerified {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+
+	token, err := usecase.jwtManager.GenerateToken(user.ID, user.Password, time.Hour*24)
+	if err != nil {
+		return id, err
+	}
+
+	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password",
+		mailCommon.TextResetPassword(token))
+
+	return user.ID, err
+}
+
 func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email string) (err error) {
 	user, err := usecase.userRepository.FindByEmail(ctx, email)
 	if err != nil {
@@ -73,12 +96,13 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		return errorCommon.NewInvariantError("email already verified")
 	}
 
-	token, err := usecase.jwtManager.GenerateToken(user.ID, time.Hour*24*30)
+	token, err := usecase.jwtManager.GenerateToken(user.ID, "", time.Hour*24*30)
 	if err != nil {
 		return err
 	}
 
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation",
+	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account Activation",
 		mailCommon.TextRegisterCompletion(user.Email, token))
 
 	return err
