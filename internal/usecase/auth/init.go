@@ -28,5 +28,5 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 		return accessToken, err
 	}
 
-	return a.jwtManager.GenerateToken(user.ID, time.Hour*8)
+	return a.jwtManager.GenerateToken(user.ID, "", time.Hour*8)
 }
