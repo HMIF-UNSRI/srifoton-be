@@ -61,3 +61,12 @@ func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Con
 	}
 	return id, err
 }
+
+func (repository postgresUserRepositoryImpl) UpdatePassword(ctx context.Context, id, password string) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET password = $1 WHERE id = $2 RETURNING id;", password, id)
+	err = row.Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+	return id, err
+}

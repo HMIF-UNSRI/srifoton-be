@@ -32,6 +32,12 @@ var _ user.Repository = &RepositoryMock{}
 // 			InsertFunc: func(ctx context.Context, user userDomain.User) (string, error) {
 // 				panic("mock out the Insert method")
 // 			},
+// 			UpdatePasswordFunc: func(ctx context.Context, id string, password string) (string, error) {
+// 				panic("mock out the UpdatePassword method")
+// 			},
+// 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
+// 				panic("mock out the UpdateVerifiedEmail method")
+// 			},
 // 		}
 //
 // 		// use mockedRepository in code that requires user.Repository
@@ -50,6 +56,12 @@ type RepositoryMock struct {
 
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, user userDomain.User) (string, error)
+
+	// UpdatePasswordFunc mocks the UpdatePassword method.
+	UpdatePasswordFunc func(ctx context.Context, id string, password string) (string, error)
+
+	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
+	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -79,11 +91,29 @@ type RepositoryMock struct {
 			// User is the user argument value.
 			User userDomain.User
 		}
+		// UpdatePassword holds details about calls to the UpdatePassword method.
+		UpdatePassword []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+			// Password is the password argument value.
+			Password string
+		}
+		// UpdateVerifiedEmail holds details about calls to the UpdateVerifiedEmail method.
+		UpdateVerifiedEmail []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
 	}
-	lockFindAll     sync.RWMutex
-	lockFindByEmail sync.RWMutex
-	lockFindByID    sync.RWMutex
-	lockInsert      sync.RWMutex
+	lockFindAll             sync.RWMutex
+	lockFindByEmail         sync.RWMutex
+	lockFindByID            sync.RWMutex
+	lockInsert              sync.RWMutex
+	lockUpdatePassword      sync.RWMutex
+	lockUpdateVerifiedEmail sync.RWMutex
 }
 
 // FindAll calls FindAllFunc.
@@ -219,5 +249,79 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert
 	mock.lockInsert.RUnlock()
+	return calls
+}
+
+// UpdatePassword calls UpdatePasswordFunc.
+func (mock *RepositoryMock) UpdatePassword(ctx context.Context, id string, password string) (string, error) {
+	if mock.UpdatePasswordFunc == nil {
+		panic("RepositoryMock.UpdatePasswordFunc: method is nil but Repository.UpdatePassword was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		ID       string
+		Password string
+	}{
+		Ctx:      ctx,
+		ID:       id,
+		Password: password,
+	}
+	mock.lockUpdatePassword.Lock()
+	mock.calls.UpdatePassword = append(mock.calls.UpdatePassword, callInfo)
+	mock.lockUpdatePassword.Unlock()
+	return mock.UpdatePasswordFunc(ctx, id, password)
+}
+
+// UpdatePasswordCalls gets all the calls that were made to UpdatePassword.
+// Check the length with:
+//     len(mockedRepository.UpdatePasswordCalls())
+func (mock *RepositoryMock) UpdatePasswordCalls() []struct {
+	Ctx      context.Context
+	ID       string
+	Password string
+} {
+	var calls []struct {
+		Ctx      context.Context
+		ID       string
+		Password string
+	}
+	mock.lockUpdatePassword.RLock()
+	calls = mock.calls.UpdatePassword
+	mock.lockUpdatePassword.RUnlock()
+	return calls
+}
+
+// UpdateVerifiedEmail calls UpdateVerifiedEmailFunc.
+func (mock *RepositoryMock) UpdateVerifiedEmail(ctx context.Context, id string) (string, error) {
+	if mock.UpdateVerifiedEmailFunc == nil {
+		panic("RepositoryMock.UpdateVerifiedEmailFunc: method is nil but Repository.UpdateVerifiedEmail was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockUpdateVerifiedEmail.Lock()
+	mock.calls.UpdateVerifiedEmail = append(mock.calls.UpdateVerifiedEmail, callInfo)
+	mock.lockUpdateVerifiedEmail.Unlock()
+	return mock.UpdateVerifiedEmailFunc(ctx, id)
+}
+
+// UpdateVerifiedEmailCalls gets all the calls that were made to UpdateVerifiedEmail.
+// Check the length with:
+//     len(mockedRepository.UpdateVerifiedEmailCalls())
+func (mock *RepositoryMock) UpdateVerifiedEmailCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockUpdateVerifiedEmail.RLock()
+	calls = mock.calls.UpdateVerifiedEmail
+	mock.lockUpdateVerifiedEmail.RUnlock()
 	return calls
 }

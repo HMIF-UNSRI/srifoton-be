@@ -59,8 +59,49 @@ func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid str
 		return rid, errorCommon.NewInvariantError("email already verified")
 	}
 
-	rid, err = usecase.userRepository.UpdateVerifiedEmail(ctx, id)
-	return rid, err
+	return usecase.userRepository.UpdateVerifiedEmail(ctx, id)
+}
+
+func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string) (id string, err error) {
+	user, err := usecase.userRepository.FindByEmail(ctx, email)
+	if err != nil {
+		return id, err
+	}
+
+	// Prevent sending spam emails
+	if !user.IsEmailVerified {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+
+	token, err := usecase.jwtManager.GenerateToken(user.ID, user.Password, time.Hour*24)
+	if err != nil {
+		return id, err
+	}
+
+	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password",
+		mailCommon.TextResetPassword(token))
+
+	return user.ID, err
+}
+
+func (usecase userUsecaseImpl) ResetPassword(ctx context.Context, id, oldPassword, newPassword string) (rid string, err error) {
+	user, err := usecase.userRepository.FindByID(ctx, id)
+	if err != nil {
+		return rid, err
+	}
+
+	// Compare password between db and jwt
+	if user.Password != oldPassword {
+		return rid, errorCommon.NewForbiddenError("wrong password")
+	}
+
+	hashPassword, err := usecase.passwordManager.HashPassword(newPassword)
+	if err != nil {
+		return id, err
+	}
+
+	return usecase.userRepository.UpdatePassword(ctx, id, hashPassword)
 }
 
 func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email string) (err error) {
@@ -73,12 +114,13 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		return errorCommon.NewInvariantError("email already verified")
 	}
 
-	token, err := usecase.jwtManager.GenerateToken(user.ID, time.Hour*24*30)
+	token, err := usecase.jwtManager.GenerateToken(user.ID, "", time.Hour*24*30)
 	if err != nil {
 		return err
 	}
 
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation",
+	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account Activation",
 		mailCommon.TextRegisterCompletion(user.Email, token))
 
 	return err

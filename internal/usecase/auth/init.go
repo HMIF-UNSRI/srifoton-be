@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user"
@@ -24,9 +25,13 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 		return accessToken, err
 	}
 
+	if !user.IsEmailVerified {
+		return accessToken, errorCommon.NewNotFoundError("user not found")
+	}
+
 	if err := a.passwordManager.CheckPasswordHash(password, user.Password); err != nil {
 		return accessToken, err
 	}
 
-	return a.jwtManager.GenerateToken(user.ID, time.Hour*8)
+	return a.jwtManager.GenerateToken(user.ID, "", time.Hour*8)
 }

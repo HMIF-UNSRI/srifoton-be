@@ -13,4 +13,5 @@ type Repository interface {
 	FindByEmail(ctx context.Context, email string) (user userDomain.User, err error)
 	FindAll(ctx context.Context) (users userDomain.User, err error)
 	UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error)
+	UpdatePassword(ctx context.Context, id, password string) (rid string, err error)
 }
