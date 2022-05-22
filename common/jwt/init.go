@@ -26,12 +26,12 @@ func (j JWTManager) GenerateToken(id, password string, duration time.Duration) (
 	return token.SignedString(j.AccessTokenKey)
 }
 
-func (j JWTManager) VerifyToken(tokenString string) (string, error) {
+func (j JWTManager) VerifyToken(tokenString string) (id, password string, err error) {
 	claims := &CustomClaims{}
 	if _, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 		return j.AccessTokenKey, nil
 	}); err != nil {
-		return "", errorCommon.NewUnauthorizedError("token not valid")
+		return id, password, errorCommon.NewUnauthorizedError("token not valid")
 	}
-	return claims.ID, nil
+	return claims.ID, claims.Password, nil
 }

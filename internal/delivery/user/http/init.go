@@ -21,6 +21,7 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 
 	router.Use(httpCommon.MiddlewareJWT(jwtManager))
 	router.GET("/activate", handler.activate)
+	router.PATCH("/reset-password", handler.resetPassword)
 	return handler
 }
 
@@ -78,6 +79,47 @@ func (h HTTPUserDelivery) forgotPassword(c *gin.Context) {
 	}
 
 	id, err := h.userUsecase.ForgotPassword(c.Request.Context(), requestBody.Email)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"id": id,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) resetPassword(c *gin.Context) {
+	var requestBody httpCommon.ResetPasswordUser
+	if err := c.BindJSON(&requestBody); err != nil {
+		return
+	}
+
+	inputUserID, ok := c.Get("user_id")
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	userID, ok := inputUserID.(string)
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+
+	inputUserPassword, ok := c.Get("user_password")
+	if !ok {
+		c.Error(ErrorUserPassword)
+		return
+	}
+	userPassword, ok := inputUserPassword.(string)
+	if !ok {
+		c.Error(ErrorUserPassword)
+		return
+	}
+
+	id, err := h.userUsecase.ResetPassword(c.Request.Context(), userID, userPassword, requestBody.NewPassword)
 	if err != nil {
 		c.Error(err)
 		return

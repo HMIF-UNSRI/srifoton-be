@@ -10,6 +10,7 @@ type Usecase interface {
 	GetUserByEmail(ctx context.Context, email string) (user userDomain.User, err error)
 	Activate(ctx context.Context, id string) (rid string, err error)
 	ForgotPassword(ctx context.Context, email string) (id string, err error)
+	ResetPassword(ctx context.Context, id, oldPassword, newPassword string) (rid string, err error)
 
 	sendMailActivation(ctx context.Context, email string) (err error)
 }

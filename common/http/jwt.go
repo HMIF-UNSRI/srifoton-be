@@ -16,7 +16,7 @@ func MiddlewareJWT(j *jwt.JWTManager) gin.HandlerFunc {
 		}
 		tokenString := authHeader[BEARER:]
 
-		id, err := j.VerifyToken(tokenString)
+		id, password, err := j.VerifyToken(tokenString)
 		if err != nil {
 			c.Error(err)
 			c.Abort()
@@ -24,6 +24,7 @@ func MiddlewareJWT(j *jwt.JWTManager) gin.HandlerFunc {
 		}
 
 		c.Set("user_id", id)
+		c.Set("user_password", password)
 		c.Next()
 	}
 }

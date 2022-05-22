@@ -59,8 +59,7 @@ func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid str
 		return rid, errorCommon.NewInvariantError("email already verified")
 	}
 
-	rid, err = usecase.userRepository.UpdateVerifiedEmail(ctx, id)
-	return rid, err
+	return usecase.userRepository.UpdateVerifiedEmail(ctx, id)
 }
 
 func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string) (id string, err error) {
@@ -84,6 +83,25 @@ func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string)
 		mailCommon.TextResetPassword(token))
 
 	return user.ID, err
+}
+
+func (usecase userUsecaseImpl) ResetPassword(ctx context.Context, id, oldPassword, newPassword string) (rid string, err error) {
+	user, err := usecase.userRepository.FindByID(ctx, id)
+	if err != nil {
+		return rid, err
+	}
+
+	// Compare password between db and jwt
+	if user.Password != oldPassword {
+		return rid, errorCommon.NewForbiddenError("wrong password")
+	}
+
+	hashPassword, err := usecase.passwordManager.HashPassword(newPassword)
+	if err != nil {
+		return id, err
+	}
+
+	return usecase.userRepository.UpdatePassword(ctx, id, hashPassword)
 }
 
 func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email string) (err error) {

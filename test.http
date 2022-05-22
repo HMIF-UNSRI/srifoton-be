@@ -55,7 +55,7 @@ POST http://localhost:8000/api/auth
 Content-Type: application/json
 
 {
-  "email": "aryahmph@gmail.com",
+  "email": "aryayun90@gmail.com",
   "password": "H4CK3D_BY_HM1F"
 }
 
@@ -96,4 +96,13 @@ Content-Type: application/json
 
 {
   "email": "aryayun90000000@gmail.com"
+}
+
+### Reset Password
+PATCH http://localhost:8000/api/users/reset-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFiMDZjYWZjLTk2ZWQtNGQyYy04ZTI0LTg0ODc4ZjczZWZiYSIsInBhc3N3b3JkIjoiJDJhJDEwJG9SRlVtQmo3OHhXd0lFRzM3b2Y0TU96cHIvdzdUY3hjNUxmSTdsZjlUYnBMdzl5Qmsud25LIiwiZXhwIjoxNjUzMjg4NTc1fQ.r0Ny-guFAkgqFB7XZ8Y93JwwSbj2Rx-vT9_F9sQ-2R4
+
+{
+  "new_password": "AKU_CINTA_KAMU"
 }

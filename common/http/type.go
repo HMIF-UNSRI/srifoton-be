@@ -30,4 +30,8 @@ type (
 	UserEmail struct {
 		Email string `json:"email" binding:"required,email"`
 	}
+
+	ResetPasswordUser struct {
+		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
+	}
 )
