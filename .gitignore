@@ -15,4 +15,4 @@ log
 *.png
 *.pdf
 
-!_docs/exported_uml
+!_docs/exported_uml/*.png
