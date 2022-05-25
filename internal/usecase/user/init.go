@@ -2,13 +2,14 @@ package user
 
 import (
 	"context"
+	"time"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	userRepository "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user"
-	"time"
 )
 
 type userUsecaseImpl struct {
@@ -72,8 +73,7 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 	if user.IsEmailVerified {
 		return errorCommon.NewInvariantError("email already verified")
 	}
-
-	token, err := usecase.jwtManager.GenerateToken(user.ID, time.Hour*24*30)
+	token, err := usecase.jwtManager.GenerateToken(user.ID.String(), time.Hour*24*30)
 	if err != nil {
 		return err
 	}
@@ -82,4 +82,12 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		mailCommon.TextRegisterCompletion(user.Email, token))
 
 	return err
+}
+
+func (usecase userUsecaseImpl) InsertFile(ctx context.Context) (id string, err error) {
+	id, err = usecase.userRepository.InsertFile(ctx)
+	if err != nil {
+		return "", errorCommon.NewInvariantError("There's something wrong")
+	}
+	return id, nil
 }

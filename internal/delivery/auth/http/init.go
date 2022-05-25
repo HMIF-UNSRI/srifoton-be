@@ -1,10 +1,11 @@
 package http
 
 import (
+	"net/http"
+
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type HTTPAuthDelivery struct {

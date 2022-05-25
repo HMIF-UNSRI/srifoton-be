@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
@@ -13,11 +15,11 @@ import (
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user/postgres"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
-	"log"
 )
 
 func main() {
 	cfg := env.LoadConfig()
+	fmt.Print(cfg.PostgresURL)
 	db := dbCommon.NewPostgres(cfg.PostgresURL)
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()

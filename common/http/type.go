@@ -1,6 +1,10 @@
 package http
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type (
 	Error struct {
@@ -19,11 +23,15 @@ type (
 	}
 
 	AddUser struct {
-		ID        string    `json:"id"`
-		Email     string    `json:"email" binding:"required,email"`
-		Password  string    `json:"password" binding:"required,gte=8,lte=16"`
-		Role      string    `json:"role"`
-		CreatedAt time.Time `json:"created_at"`
-		UpdatedAt time.Time `json:"updated_at"`
+		// ID       string `json:"id"`
+		IdKpm    uuid.UUID `json:"id" binding:"required"`
+		Nama     string    `json:"nama" binding:"required"`
+		Nim      string    `json:"nim" binding:"required"`
+		Email    string    `json:"email" binding:"required,email"`
+		Password string    `json:"password" binding:"required,gte=8,lte=16"`
+		NoWa     string    `json:"no_wa" binding:"required"`
+		Role     string    `json:"role"`
+		// CreatedAt time.Time `json:"created_at"`
+		// UpdatedAt time.Time `json:"updated_at"`
 	}
 )

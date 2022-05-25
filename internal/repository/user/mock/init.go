@@ -32,6 +32,12 @@ var _ user.Repository = &RepositoryMock{}
 // 			InsertFunc: func(ctx context.Context, user userDomain.User) (string, error) {
 // 				panic("mock out the Insert method")
 // 			},
+// 			InsertFileFunc: func(ctx context.Context) (string, error) {
+// 				panic("mock out the InsertFile method")
+// 			},
+// 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
+// 				panic("mock out the UpdateVerifiedEmail method")
+// 			},
 // 		}
 //
 // 		// use mockedRepository in code that requires user.Repository
@@ -50,6 +56,12 @@ type RepositoryMock struct {
 
 	// InsertFunc mocks the Insert method.
 	InsertFunc func(ctx context.Context, user userDomain.User) (string, error)
+
+	// InsertFileFunc mocks the InsertFile method.
+	InsertFileFunc func(ctx context.Context) (string, error)
+
+	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
+	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -79,11 +91,25 @@ type RepositoryMock struct {
 			// User is the user argument value.
 			User userDomain.User
 		}
+		// InsertFile holds details about calls to the InsertFile method.
+		InsertFile []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+		}
+		// UpdateVerifiedEmail holds details about calls to the UpdateVerifiedEmail method.
+		UpdateVerifiedEmail []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
 	}
-	lockFindAll     sync.RWMutex
-	lockFindByEmail sync.RWMutex
-	lockFindByID    sync.RWMutex
-	lockInsert      sync.RWMutex
+	lockFindAll             sync.RWMutex
+	lockFindByEmail         sync.RWMutex
+	lockFindByID            sync.RWMutex
+	lockInsert              sync.RWMutex
+	lockInsertFile          sync.RWMutex
+	lockUpdateVerifiedEmail sync.RWMutex
 }
 
 // FindAll calls FindAllFunc.
@@ -219,5 +245,71 @@ func (mock *RepositoryMock) InsertCalls() []struct {
 	mock.lockInsert.RLock()
 	calls = mock.calls.Insert
 	mock.lockInsert.RUnlock()
+	return calls
+}
+
+// InsertFile calls InsertFileFunc.
+func (mock *RepositoryMock) InsertFile(ctx context.Context) (string, error) {
+	if mock.InsertFileFunc == nil {
+		panic("RepositoryMock.InsertFileFunc: method is nil but Repository.InsertFile was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+	}{
+		Ctx: ctx,
+	}
+	mock.lockInsertFile.Lock()
+	mock.calls.InsertFile = append(mock.calls.InsertFile, callInfo)
+	mock.lockInsertFile.Unlock()
+	return mock.InsertFileFunc(ctx)
+}
+
+// InsertFileCalls gets all the calls that were made to InsertFile.
+// Check the length with:
+//     len(mockedRepository.InsertFileCalls())
+func (mock *RepositoryMock) InsertFileCalls() []struct {
+	Ctx context.Context
+} {
+	var calls []struct {
+		Ctx context.Context
+	}
+	mock.lockInsertFile.RLock()
+	calls = mock.calls.InsertFile
+	mock.lockInsertFile.RUnlock()
+	return calls
+}
+
+// UpdateVerifiedEmail calls UpdateVerifiedEmailFunc.
+func (mock *RepositoryMock) UpdateVerifiedEmail(ctx context.Context, id string) (string, error) {
+	if mock.UpdateVerifiedEmailFunc == nil {
+		panic("RepositoryMock.UpdateVerifiedEmailFunc: method is nil but Repository.UpdateVerifiedEmail was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockUpdateVerifiedEmail.Lock()
+	mock.calls.UpdateVerifiedEmail = append(mock.calls.UpdateVerifiedEmail, callInfo)
+	mock.lockUpdateVerifiedEmail.Unlock()
+	return mock.UpdateVerifiedEmailFunc(ctx, id)
+}
+
+// UpdateVerifiedEmailCalls gets all the calls that were made to UpdateVerifiedEmail.
+// Check the length with:
+//     len(mockedRepository.UpdateVerifiedEmailCalls())
+func (mock *RepositoryMock) UpdateVerifiedEmailCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockUpdateVerifiedEmail.RLock()
+	calls = mock.calls.UpdateVerifiedEmail
+	mock.lockUpdateVerifiedEmail.RUnlock()
 	return calls
 }

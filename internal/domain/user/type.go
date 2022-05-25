@@ -1,12 +1,19 @@
 package user
 
-import "github.com/HMIF-UNSRI/srifoton-be/internal/domain"
+import (
+	"github.com/HMIF-UNSRI/srifoton-be/internal/domain"
+	"github.com/google/uuid"
+)
 
 type (
 	User struct {
-		ID       string
+		ID       uuid.UUID
+		IdKpm    uuid.UUID
+		Nama     string
+		Nim      string
 		Email    string
 		Password string
+		NoWa     string
 		Role     role
 
 		IsEmailVerified bool

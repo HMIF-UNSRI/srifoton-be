@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
+	"github.com/google/uuid"
 )
 
 type postgresUserRepositoryImpl struct {
@@ -17,9 +20,13 @@ func NewPostgresUserRepositoryImpl(db *sql.DB) postgresUserRepositoryImpl {
 }
 
 func (repository postgresUserRepositoryImpl) Insert(ctx context.Context, user userDomain.User) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(email, password) VALUES ($1, $2) RETURNING id;",
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(id_kpm, nama, nim, email, password, no_wa) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;",
+		user.IdKpm,
+		user.Nama,
+		user.Nim,
 		user.Email,
 		user.Password,
+		user.NoWa,
 	)
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -59,5 +66,18 @@ func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Con
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("user not found")
 	}
+	return id, err
+}
+
+func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context) (id string, err error) {
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO uploads(file_name) VALUES ($1) RETURNING id;",
+		uuid.NewString(),
+	)
+
+	err = row.Scan(&id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+	fmt.Println("Inserted")
 	return id, err
 }
