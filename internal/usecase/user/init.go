@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
@@ -43,6 +44,29 @@ func (usecase userUsecaseImpl) Register(ctx context.Context, user userDomain.Use
 
 	err = usecase.sendMailActivation(ctx, user.Email)
 	return id, err
+}
+
+func (usecase userUsecaseImpl) RegisterMember(ctx context.Context, user userDomain.User) (id string, err error) {
+	_, err = usecase.userRepository.FindByEmail(ctx, user.Email)
+	if err == nil {
+		return id, errorCommon.NewInvariantError("email already exist")
+	}
+
+	if err != nil {
+		return id, err
+	}
+
+	// id, err = usecase.userRepository.InsertMember(ctx, user)
+	if err != nil {
+		return id, err
+	}
+
+	return id, err
+}
+
+func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context) (id string, err error) {
+	// id, err = usecase.userRepository.InsertTeam()
+	return "sad", errors.New("")
 }
 
 func (usecase userUsecaseImpl) GetUserByEmail(ctx context.Context, email string) (user userDomain.User, err error) {

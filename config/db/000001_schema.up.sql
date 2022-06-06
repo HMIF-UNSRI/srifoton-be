@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users
     id                uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     id_kpm            uuid             NOT NULL UNIQUE REFERENCES uploads,
     nama              varchar(255)     NOT NULL,
-    nim               varchar(255)     NOT NULL,
+    nim               varchar(255)     NOT NULL UNIQUE,
     email             varchar(255)     NOT NULL UNIQUE,
     password          varchar(255)     NOT NULL,
     role              role_type        NOT NULL DEFAULT 'BASE',

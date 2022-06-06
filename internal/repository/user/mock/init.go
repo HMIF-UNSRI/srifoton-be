@@ -5,6 +5,7 @@ package mock
 
 import (
 	"context"
+	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	"github.com/HMIF-UNSRI/srifoton-be/internal/repository/user"
 	"sync"
@@ -35,6 +36,12 @@ var _ user.Repository = &RepositoryMock{}
 // 			InsertFileFunc: func(ctx context.Context) (string, error) {
 // 				panic("mock out the InsertFile method")
 // 			},
+// 			InsertMemberFunc: func(ctx context.Context, team teamDomain.Team) (string, error) {
+// 				panic("mock out the InsertMember method")
+// 			},
+// 			InsertTeamFunc: func(ctx context.Context, team teamDomain.Team) (string, error) {
+// 				panic("mock out the InsertTeam method")
+// 			},
 // 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
 // 				panic("mock out the UpdateVerifiedEmail method")
 // 			},
@@ -59,6 +66,12 @@ type RepositoryMock struct {
 
 	// InsertFileFunc mocks the InsertFile method.
 	InsertFileFunc func(ctx context.Context) (string, error)
+
+	// InsertMemberFunc mocks the InsertMember method.
+	InsertMemberFunc func(ctx context.Context, team teamDomain.Team) (string, error)
+
+	// InsertTeamFunc mocks the InsertTeam method.
+	InsertTeamFunc func(ctx context.Context, team teamDomain.Team) (string, error)
 
 	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
 	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
@@ -96,6 +109,20 @@ type RepositoryMock struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 		}
+		// InsertMember holds details about calls to the InsertMember method.
+		InsertMember []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Team is the team argument value.
+			Team teamDomain.Team
+		}
+		// InsertTeam holds details about calls to the InsertTeam method.
+		InsertTeam []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Team is the team argument value.
+			Team teamDomain.Team
+		}
 		// UpdateVerifiedEmail holds details about calls to the UpdateVerifiedEmail method.
 		UpdateVerifiedEmail []struct {
 			// Ctx is the ctx argument value.
@@ -109,6 +136,8 @@ type RepositoryMock struct {
 	lockFindByID            sync.RWMutex
 	lockInsert              sync.RWMutex
 	lockInsertFile          sync.RWMutex
+	lockInsertMember        sync.RWMutex
+	lockInsertTeam          sync.RWMutex
 	lockUpdateVerifiedEmail sync.RWMutex
 }
 
@@ -276,6 +305,76 @@ func (mock *RepositoryMock) InsertFileCalls() []struct {
 	mock.lockInsertFile.RLock()
 	calls = mock.calls.InsertFile
 	mock.lockInsertFile.RUnlock()
+	return calls
+}
+
+// InsertMember calls InsertMemberFunc.
+func (mock *RepositoryMock) InsertMember(ctx context.Context, team teamDomain.Team) (string, error) {
+	if mock.InsertMemberFunc == nil {
+		panic("RepositoryMock.InsertMemberFunc: method is nil but Repository.InsertMember was just called")
+	}
+	callInfo := struct {
+		Ctx  context.Context
+		Team teamDomain.Team
+	}{
+		Ctx:  ctx,
+		Team: team,
+	}
+	mock.lockInsertMember.Lock()
+	mock.calls.InsertMember = append(mock.calls.InsertMember, callInfo)
+	mock.lockInsertMember.Unlock()
+	return mock.InsertMemberFunc(ctx, team)
+}
+
+// InsertMemberCalls gets all the calls that were made to InsertMember.
+// Check the length with:
+//     len(mockedRepository.InsertMemberCalls())
+func (mock *RepositoryMock) InsertMemberCalls() []struct {
+	Ctx  context.Context
+	Team teamDomain.Team
+} {
+	var calls []struct {
+		Ctx  context.Context
+		Team teamDomain.Team
+	}
+	mock.lockInsertMember.RLock()
+	calls = mock.calls.InsertMember
+	mock.lockInsertMember.RUnlock()
+	return calls
+}
+
+// InsertTeam calls InsertTeamFunc.
+func (mock *RepositoryMock) InsertTeam(ctx context.Context, team teamDomain.Team) (string, error) {
+	if mock.InsertTeamFunc == nil {
+		panic("RepositoryMock.InsertTeamFunc: method is nil but Repository.InsertTeam was just called")
+	}
+	callInfo := struct {
+		Ctx  context.Context
+		Team teamDomain.Team
+	}{
+		Ctx:  ctx,
+		Team: team,
+	}
+	mock.lockInsertTeam.Lock()
+	mock.calls.InsertTeam = append(mock.calls.InsertTeam, callInfo)
+	mock.lockInsertTeam.Unlock()
+	return mock.InsertTeamFunc(ctx, team)
+}
+
+// InsertTeamCalls gets all the calls that were made to InsertTeam.
+// Check the length with:
+//     len(mockedRepository.InsertTeamCalls())
+func (mock *RepositoryMock) InsertTeamCalls() []struct {
+	Ctx  context.Context
+	Team teamDomain.Team
+} {
+	var calls []struct {
+		Ctx  context.Context
+		Team teamDomain.Team
+	}
+	mock.lockInsertTeam.RLock()
+	calls = mock.calls.InsertTeam
+	mock.lockInsertTeam.RUnlock()
 	return calls
 }
 

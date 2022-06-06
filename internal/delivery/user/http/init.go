@@ -6,6 +6,8 @@ import (
 
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
+
+	// teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	userUsecase "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-gonic/gin"
@@ -79,6 +81,29 @@ func (h HTTPUserDelivery) InsertFile(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	id, err := h.userUsecase.InsertFile(ctx)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"id": id,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) RegisterCompetition(c *gin.Context) {
+
+	ctx := c.Request.Context()
+
+	id, err := h.userUsecase.InsertFile(ctx)
+	var requestBody httpCommon.Team
+	if err := c.BindJSON(&requestBody); err != nil {
+		fmt.Println("error")
+		return
+	}
+
 	if err != nil {
 		c.Error(err)
 		return

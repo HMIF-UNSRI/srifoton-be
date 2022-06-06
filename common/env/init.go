@@ -17,7 +17,6 @@ type config struct {
 
 func LoadConfig() *config {
 	cfg := new(config)
-	// cfg.PostgresURL = "postgresql://postgres:TheNewspaper@localhost:5432/srifoton?sslmode=disable"
 	if err := env.Parse(cfg); err != nil {
 		panic(err)
 	}

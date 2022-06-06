@@ -11,5 +11,6 @@ type Usecase interface {
 	GetUserByEmail(ctx context.Context, email string) (user userDomain.User, err error)
 	Activate(ctx context.Context, id string) (rid string, err error)
 	InsertFile(ctx context.Context) (id string, err error)
+	RegisterCompetition(ctx context.Context) (id string, err error)
 	sendMailActivation(ctx context.Context, email string) (err error)
 }

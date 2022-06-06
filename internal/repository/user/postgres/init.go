@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
+	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	"github.com/google/uuid"
 )
@@ -77,6 +78,42 @@ func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context) (id
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("user not found")
+	}
+	fmt.Println("Inserted")
+	return id, err
+}
+
+func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, team teamDomain.Team) (id string, err error) {
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		team.IdLeader,
+		team.Competition,
+		team.IdMember1,
+		team.IdMember2,
+		team.IdPayment,
+		team.IsConfirmed,
+	)
+
+	err = row.Scan(&id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("team not found")
+	}
+	fmt.Println("Inserted")
+	return id, err
+}
+
+func (repository postgresUserRepositoryImpl) InsertMember(ctx context.Context, team teamDomain.Team) (id string, err error) {
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		team.IdLeader,
+		team.Competition,
+		team.IdMember1,
+		team.IdMember2,
+		team.IdPayment,
+		team.IsConfirmed,
+	)
+
+	err = row.Scan(&id)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("team not found")
 	}
 	fmt.Println("Inserted")
 	return id, err
