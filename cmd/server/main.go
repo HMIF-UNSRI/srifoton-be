@@ -19,7 +19,6 @@ import (
 
 func main() {
 	cfg := env.LoadConfig()
-	fmt.Print(cfg.PostgresURL)
 	db := dbCommon.NewPostgres(cfg.PostgresURL)
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
@@ -29,6 +28,8 @@ func main() {
 
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
 	httpServer.Router.RedirectTrailingSlash = true
+	httpServer.Router.MaxMultipartMemory = 8 << 8
+
 	root := httpServer.Router.Group("/api")
 
 	userRepository := userRepo.NewPostgresUserRepositoryImpl(db)

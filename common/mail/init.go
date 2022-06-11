@@ -29,5 +29,9 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
 
 	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), []byte(bodyMessage))
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
 	return err
 }

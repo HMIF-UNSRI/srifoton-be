@@ -10,8 +10,8 @@ type (
 		ID          uuid.UUID
 		IdLeader    uuid.UUID
 		Competition competition
-		IdMember1   uuid.UUID
-		IdMember2   uuid.UUID
+		IdMember1   uuid.NullUUID
+		IdMember2   uuid.NullUUID
 		IdPayment   uuid.UUID
 		IsConfirmed bool
 

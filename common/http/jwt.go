@@ -15,7 +15,6 @@ func MiddlewareJWT(j *jwt.JWTManager) gin.HandlerFunc {
 			return
 		}
 		tokenString := authHeader[BEARER:]
-
 		id, err := j.VerifyToken(tokenString)
 		if err != nil {
 			c.Error(err)

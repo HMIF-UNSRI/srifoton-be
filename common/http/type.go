@@ -23,29 +23,18 @@ type (
 	}
 
 	Member struct {
-		IdKpm uuid.UUID `json:"id" binding:"required"`
-		Nama  string    `json:"nama" binding:"required"`
-		Nim   string    `json:"nim" binding:"required"`
-		Email string    `json:"email" binding:"required,email"`
-		NoWa  string    `json:"no_wa" binding:"required"`
+		IdKpm uuid.UUID `json:"id" binding:"required_with=Nama Nim Email NoWa"`
+		Nama  string    `json:"nama" binding:"required_with=IdKpm"`
+		Nim   string    `json:"nim" binding:"required_with=IdKpm"`
+		Email string    `json:"email" binding:"required_with=IdKpm"`
+		NoWa  string    `json:"no_wa" binding:"required_with=IdKpm"`
 	}
 
 	Team struct {
-		IdLead      uuid.UUID `json:"id_lead" binding:"required"`
 		Competition string    `json:"competition" binding:"required"`
-		// IdMember1   uuid.UUID `json:"id_member_1"`
-		// IdMember2   uuid.UUID `json:"id_member_2"`
-		IdKpmMember1 uuid.UUID `json:"id_member_1"`
-		NamaMember1  string    `json:"nama_member_1"`
-		NimMember1   string    `json:"nim_member_1"`
-		EmailMember1 string    `json:"email_member_1"`
-		NoWaMember1  string    `json:"no_wa_member_1"`
-		IdKpmMember2 uuid.UUID `json:"id_member_2"`
-		NamaMember2  string    `json:"nama_member_2"`
-		NimMember2   string    `json:"nim_member_2"`
-		EmailMember2 string    `json:"email_member_2"`
-		NoWaMember2  string    `json:"no_wa_member_2"`
-		IdPayment    uuid.UUID `json:"id_payment"`
+		Member1     Member    `json:"member_1"`
+		Member2     Member    `json:"member_2"`
+		IdPayment   uuid.UUID `json:"id_payment"`
 	}
 
 	AddUser struct {

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
+	domainMember "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
 	domainTeam "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	domainUser "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	"github.com/google/uuid"
@@ -27,19 +28,37 @@ func (h HTTPUserDelivery) mapUserBodyToDomain(u httpCommon.AddUser) domainUser.U
 	return user
 }
 
-func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId uuid.UUID, member1Id uuid.UUID, member2Id uuid.UUID, paymentId uuid.UUID) domainTeam.Team {
+func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId string, member1Id uuid.NullUUID, member2Id uuid.NullUUID, t httpCommon.Team) domainTeam.Team {
+
 	team := domainTeam.Team{
 		ID:          uuid.New(),
-		IdLeader:    leadId,
+		IdLeader:    uuid.MustParse(leadId),
 		IdMember1:   member1Id,
 		IdMember2:   member2Id,
-		IdPayment:   paymentId,
+		IdPayment:   t.IdPayment,
 		IsConfirmed: false,
 		Timestamp: domainUser.Timestamp{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
 		},
 	}
-	// team.SetTeamCompetitionString(u.Competition)
+	team.SetTeamCompetitionString(t.Competition)
 	return team
+}
+
+func (h HTTPUserDelivery) mapMemberBodyToDomain(m httpCommon.Member) domainMember.Member {
+	member := domainMember.Member{
+		ID:    uuid.New(),
+		IdKpm: m.IdKpm,
+		Nama:  m.Nama,
+		Nim:   m.Nim,
+		Email: m.Email,
+		NoWa:  m.NoWa,
+		Timestamp: domainUser.Timestamp{
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+		},
+	}
+
+	return member
 }

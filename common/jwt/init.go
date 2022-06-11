@@ -1,9 +1,10 @@
 package jwt
 
 import (
+	"time"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/golang-jwt/jwt"
-	"time"
 )
 
 type JWTManager struct {

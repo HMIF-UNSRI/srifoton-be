@@ -2,15 +2,19 @@ package user
 
 import (
 	"context"
-	"errors"
+	"mime/multipart"
+	"strings"
 	"time"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
+	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
+	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	userRepository "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user"
+	"github.com/google/uuid"
 )
 
 type userUsecaseImpl struct {
@@ -26,7 +30,7 @@ func NewUserUsecaseImpl(userRepository userRepository.Repository, passwordManage
 		mailManager: mailManager}
 }
 
-func (usecase userUsecaseImpl) Register(ctx context.Context, user userDomain.User) (id string, err error) {
+func (usecase userUsecaseImpl) CreateAccount(ctx context.Context, user userDomain.User) (id string, err error) {
 	_, err = usecase.userRepository.FindByEmail(ctx, user.Email)
 	if err == nil {
 		return id, errorCommon.NewInvariantError("email already exist")
@@ -37,58 +41,62 @@ func (usecase userUsecaseImpl) Register(ctx context.Context, user userDomain.Use
 	}
 	user.Password = hashPassword
 
-	id, err = usecase.userRepository.Insert(ctx, user)
+	id, err = usecase.userRepository.InsertUser(ctx, user)
 	if err != nil {
 		return id, err
 	}
 
-	err = usecase.sendMailActivation(ctx, user.Email)
+	err = usecase.GetMailActivation(ctx, user.Email)
 	return id, err
 }
 
-func (usecase userUsecaseImpl) RegisterMember(ctx context.Context, user userDomain.User) (id string, err error) {
-	_, err = usecase.userRepository.FindByEmail(ctx, user.Email)
-	if err == nil {
-		return id, errorCommon.NewInvariantError("email already exist")
-	}
-
+func (usecase userUsecaseImpl) CreateMember(ctx context.Context, m memberDomain.Member) (id uuid.NullUUID, err error) {
+	id, err = usecase.userRepository.InsertMember(ctx, m)
 	if err != nil {
-		return id, err
+		return id, errorCommon.NewInvariantError("There's something wrong")
 	}
+	return id, nil
+}
 
-	// id, err = usecase.userRepository.InsertMember(ctx, user)
+func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team teamDomain.Team) (id string, err error) {
+	id, err = usecase.userRepository.InsertTeam(ctx, team)
 	if err != nil {
-		return id, err
+		return "", errorCommon.NewInvariantError(err.Error())
+	}
+	return id, nil
+}
+
+func (usecase userUsecaseImpl) UploadKPM(ctx context.Context, file *multipart.FileHeader) (id string, err error) {
+	ext := strings.Split(file.Filename, ".")
+	extension := ext[len(ext)-1]
+
+	if extension != "png" {
+		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
 	}
 
-	return id, err
-}
-
-func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context) (id string, err error) {
-	// id, err = usecase.userRepository.InsertTeam()
-	return "sad", errors.New("")
-}
-
-func (usecase userUsecaseImpl) GetUserByEmail(ctx context.Context, email string) (user userDomain.User, err error) {
-	//TODO implement me
-	panic("implement me")
-}
-
-func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid string, err error) {
-	user, err := usecase.userRepository.FindByID(ctx, id)
+	id, err = usecase.userRepository.InsertFile(ctx)
 	if err != nil {
-		return rid, err
+		return "", errorCommon.NewInvariantError("There's something wrong")
 	}
-
-	if user.IsEmailVerified {
-		return rid, errorCommon.NewInvariantError("email already verified")
-	}
-
-	rid, err = usecase.userRepository.UpdateVerifiedEmail(ctx, id)
-	return rid, err
+	return id, nil
 }
 
-func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email string) (err error) {
+func (usecase userUsecaseImpl) UploadBuktiPembayaran(ctx context.Context, file *multipart.FileHeader) (id string, err error) {
+	ext := strings.Split(file.Filename, ".")
+	extension := ext[len(ext)-1]
+
+	if extension != "png" {
+		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
+	}
+
+	id, err = usecase.userRepository.InsertFile(ctx)
+	if err != nil {
+		return "", errorCommon.NewInvariantError("There's something wrong")
+	}
+	return id, nil
+}
+
+func (usecase userUsecaseImpl) GetMailActivation(ctx context.Context, email string) (err error) {
 	user, err := usecase.userRepository.FindByEmail(ctx, email)
 	if err != nil {
 		return err
@@ -108,10 +116,16 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 	return err
 }
 
-func (usecase userUsecaseImpl) InsertFile(ctx context.Context) (id string, err error) {
-	id, err = usecase.userRepository.InsertFile(ctx)
+func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid string, err error) {
+	user, err := usecase.userRepository.FindByID(ctx, id)
 	if err != nil {
-		return "", errorCommon.NewInvariantError("There's something wrong")
+		return rid, err
 	}
-	return id, nil
+
+	if user.IsEmailVerified {
+		return rid, errorCommon.NewInvariantError("email already verified")
+	}
+
+	rid, err = usecase.userRepository.UpdateVerifiedEmail(ctx, id)
+	return rid, err
 }

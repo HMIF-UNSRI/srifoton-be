@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
+	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
 	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	"github.com/google/uuid"
@@ -20,7 +21,7 @@ func NewPostgresUserRepositoryImpl(db *sql.DB) postgresUserRepositoryImpl {
 	return postgresUserRepositoryImpl{db: db}
 }
 
-func (repository postgresUserRepositoryImpl) Insert(ctx context.Context, user userDomain.User) (id string, err error) {
+func (repository postgresUserRepositoryImpl) InsertUser(ctx context.Context, user userDomain.User) (id string, err error) {
 	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(id_kpm, nama, nim, email, password, no_wa) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;",
 		user.IdKpm,
 		user.Nama,
@@ -79,7 +80,6 @@ func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context) (id
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("user not found")
 	}
-	fmt.Println("Inserted")
 	return id, err
 }
 
@@ -90,31 +90,32 @@ func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, tea
 		team.IdMember1,
 		team.IdMember2,
 		team.IdPayment,
-		team.IsConfirmed,
 	)
 
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("team not found")
+	}
+
+	if err != nil {
+		return id, errorCommon.NewNotFoundError(err.Error())
 	}
 	fmt.Println("Inserted")
 	return id, err
 }
 
-func (repository postgresUserRepositoryImpl) InsertMember(ctx context.Context, team teamDomain.Team) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		team.IdLeader,
-		team.Competition,
-		team.IdMember1,
-		team.IdMember2,
-		team.IdPayment,
-		team.IsConfirmed,
+func (repository postgresUserRepositoryImpl) InsertMember(ctx context.Context, member memberDomain.Member) (id uuid.NullUUID, err error) {
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO members(id_kpm, nama, nim, email, no_wa) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+		member.IdKpm,
+		member.Nama,
+		member.Nim,
+		member.Email,
+		member.NoWa,
 	)
 
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
-		return id, errorCommon.NewNotFoundError("team not found")
+		return id, errorCommon.NewNotFoundError("member not found")
 	}
-	fmt.Println("Inserted")
 	return id, err
 }
