@@ -6,10 +6,15 @@ A web-based competition registration platform at the Sriwijaya Exhibition with a
 
 1. Install the latest stable version of [Go](https://go.dev/dl/)
 2. Install the latest stable version of [PostgresSQL](https://www.postgresql.org/download/)
-3. Create database and table with [the following scheme](config/db/schema.sql)
-4. Rename and configure [`.env.example`](.env.example) to `.env`
-5. If you want to enable production-mode, add `export GIN_MODE=release`
-6. Start server with the following command :
+3. Set environtment variable by using [Migrate](https://github.com/golang-migrate/migrate)
+4. Install the latest stable version of MakeFile
+5. Rename and configure [`.env.example`](.env.example) to `.env`
+6. Open terminal then do this command
+```bash
+$ make migrate-fresh
+```
+7. If you want to enable production-mode, add `export GIN_MODE=release`
+8. Start server with the following command :
 
 ```bash
 $ go run cmd/server/main.go
