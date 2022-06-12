@@ -15,7 +15,7 @@ $ make tidy
 ```
 7. Migrate db by using this command. Make sure all variables in `.env` are matching with your Postgress credentials
 ```bash
-$ make migrate-fresh
+$ make migrate-up
 ```
 8. If you want to enable production-mode, add `export GIN_MODE=release`
 9. Start server with the following command :
