@@ -9,12 +9,16 @@ A web-based competition registration platform at the Sriwijaya Exhibition with a
 3. Set environtment variable by using [Migrate](https://github.com/golang-migrate/migrate)
 4. Install the latest stable version of MakeFile
 5. Rename and configure [`.env.example`](.env.example) to `.env`
-6. Open terminal then do this command
+6. Download all dependecies by using this command
+```bash
+$ make tidy
+```
+7. Migrate db by using this command. Make sure all variables in `.env` are matching with your Postgress credentials
 ```bash
 $ make migrate-fresh
 ```
-7. If you want to enable production-mode, add `export GIN_MODE=release`
-8. Start server with the following command :
+8. If you want to enable production-mode, add `export GIN_MODE=release`
+9. Start server with the following command :
 
 ```bash
 $ go run cmd/server/main.go
