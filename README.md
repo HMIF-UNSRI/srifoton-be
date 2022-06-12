@@ -6,8 +6,8 @@ A web-based competition registration platform at the Sriwijaya Exhibition with a
 
 1. Install the latest stable version of [Go](https://go.dev/dl/)
 2. Install the latest stable version of [PostgresSQL](https://www.postgresql.org/download/)
-3. Set environtment variable by using [Migrate](https://github.com/golang-migrate/migrate)
-4. Install the latest stable version of MakeFile
+3. Set environment variable by using [Migrate](https://github.com/golang-migrate/migrate)
+4. Set environment variable or install latest stable version of MakeFile
 5. Rename and configure [`.env.example`](.env.example) to `.env`
 6. Download all dependecies by using this command
 ```bash
