@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Invoice {{TeamName}} {{ID}}</title>
+        <title>Invoice {{.TeamName}}</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, intial-scale=1">
     </head>
@@ -43,7 +43,7 @@
                         <span style="
                         font-size:18px;
                         font-weight:bold;">
-                            Hi BrotherHood
+                            Hi {{.TeamName}}
                         </span>
                         <br>
                         <br>
@@ -60,7 +60,7 @@
                             <strong>
                                 INVOICE ID:
                                 <br>
-                                DSDASDA
+                                {{.ID}}
                             </strong>
                         </span>
                         <br>
@@ -111,12 +111,12 @@
                                 <td style="
                                 vertical-align: top;
                                 width: 25%;">
-                                ASDAWDASDA
+                                {{.ID}}
                                 </td>
                                 <td style="
                                 vertical-align: top;
                                 width: 25%;">
-                                BROTHERHOOD
+                                {{.TeamName}}
                                 </td>
                             </tr>
 
@@ -137,7 +137,7 @@
                                 
                                 vertical-align: top;
                                 width: 25%;">
-                                15 JANUARY 2022
+                                {{.Date}}
                                 </td>
                             </tr>
 
@@ -151,27 +151,14 @@
                                     </strong>
                                 </td>
                             </tr>
+                            {{range .Members}}
                             <tr>
                                 <td style="
                                 vertical-align: top;">
-                                    AHMAD FAHRYAN PASARIBU
+                                    {{.}}
                                 </td>
                             </tr>
-                            <tr>
-                                <td style="
-                                vertical-align: top;">
-                                    AHMAD FAHRYAN PASARIBU
-                                </td>
-                            </tr>
-                            <tr>
-                                <td style="
-                                vertical-align: top;">
-                                    AHMAD FAHRYAN PASARIBU
-                                </td>
-                            </tr>
-
-
-                            
+                            {{end}}
                         </tbody>
                     </table>
                     <div style="
@@ -214,12 +201,12 @@
                                 <td style="
                                 vertical-align: top;
                                 text-align:left;">
-                                Competitive Programming
+                                {{.Competition}}
                                 </td>
                                 <td style="
                                 vertical-align: top;
                                 text-align:right;">
-                                IDR. 50000
+                                IDR. {{.Price}}
                                 </td>
                             </tr>
                             <tr>
@@ -243,7 +230,7 @@
                                 <td style="
                                 vertical-align: top;
                                 text-align:right;">
-                                TOTAL : IDR. 50000 
+                                TOTAL : IDR. {{.Price}}
                                 </td>
                             </tr>
                         </tbody>

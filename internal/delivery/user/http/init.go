@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -27,8 +28,8 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 	router.POST("/forgotpassword", handler.ForgotPassword)
 
 	router.Use(httpCommon.MiddlewareJWT(j))
-	router.GET("/activate", handler.ActivateUserAccount)
 	router.POST("/uploadbp", handler.UploadBuktiPembayaran)
+	router.GET("/activate/:token", handler.ActivateUserAccount)
 	router.POST("/competition", handler.RegisterCompetition)
 	router.PATCH("/resetpassword", handler.ResetPassword)
 
@@ -128,6 +129,8 @@ func (h HTTPUserDelivery) ActivateUserAccount(c *gin.Context) {
 		return
 	}
 	ctx := c.Request.Context()
+
+	fmt.Println(userID)
 
 	id, err := h.userUsecase.Activate(ctx, userID)
 	if err != nil {

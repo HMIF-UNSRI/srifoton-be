@@ -2,8 +2,6 @@ package http
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type (
@@ -23,19 +21,20 @@ type (
 	}
 
 	Member struct {
-		IdKpm uuid.UUID `json:"id_kpm" binding:"required_with=Nama Nim Email NoWa"`
-		Nama  string    `json:"nama" binding:"required_with=IdKpm"`
-		Nim   string    `json:"nim" binding:"required_with=IdKpm"`
-		Email string    `json:"email" binding:"required_with=IdKpm"`
-		NoWa  string    `json:"no_wa" binding:"required_with=IdKpm"`
-		// University
+		IdKpm      string `json:"id_kpm" binding:"required_with=Nama Nim Email NoWa university"`
+		Nama       string `json:"nama" binding:"required_with=IdKpm"`
+		Nim        string `json:"nim" binding:"required_with=IdKpm"`
+		Email      string `json:"email" binding:"required_with=IdKpm"`
+		NoWa       string `json:"no_wa" binding:"required_with=IdKpm"`
+		University string `json:"university" binding:"required_with=IdKpm"`
 	}
 
 	Team struct {
-		Competition string    `json:"competition" binding:"required"`
-		Member1     Member    `json:"member_1"`
-		Member2     Member    `json:"member_2"`
-		IdPayment   uuid.UUID `json:"id_payment"`
+		TeamName    string `json:"team_name" binding:"required"`
+		Competition string `json:"competition" binding:"required"`
+		Member1     Member `json:"member_1"`
+		Member2     Member `json:"member_2"`
+		IdPayment   string `json:"id_payment"`
 	}
 
 	AddUser struct {
@@ -53,7 +52,7 @@ type (
 	}
 
 	UserEmail struct {
-		Email string `json:"email" binding:"required, email"`
+		Email string `json:"email" binding:"required"`
 	}
 
 	ResetPassword struct {

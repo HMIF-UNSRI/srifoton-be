@@ -34,5 +34,5 @@ func (j JWTManager) VerifyToken(tokenString string) (id, password string, err er
 	}); err != nil {
 		return "", "", errorCommon.NewUnauthorizedError("token not valid")
 	}
-	return claims.Password, claims.ID, nil
+	return claims.ID, claims.Password, nil
 }

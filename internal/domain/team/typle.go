@@ -8,6 +8,7 @@ import (
 type (
 	Team struct {
 		ID          uuid.UUID
+		TeamName    string
 		IdLeader    uuid.UUID
 		Competition competition
 		IdMember1   uuid.NullUUID

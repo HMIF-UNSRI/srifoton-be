@@ -59,10 +59,28 @@ func (usecase userUsecaseImpl) CreateMember(ctx context.Context, m memberDomain.
 }
 
 func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team teamDomain.Team) (id string, err error) {
+	var leader userDomain.User
+	var memberOne memberDomain.Member
+	var memberTwo memberDomain.Member
 	id, err = usecase.userRepository.InsertTeam(ctx, team)
 	if err != nil {
 		return "", errorCommon.NewInvariantError(err.Error())
 	}
+	leader, err = usecase.userRepository.FindByID(ctx, team.IdLeader.String())
+	if err != nil {
+		return "", errorCommon.NewInvariantError(err.Error())
+	}
+	memberOne, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember1.UUID.String())
+	if err != nil {
+		return "", errorCommon.NewInvariantError(err.Error())
+	}
+	memberTwo, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember2.UUID.String())
+	if err != nil {
+		return "", errorCommon.NewInvariantError(err.Error())
+	}
+
+	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
+		mailCommon.TextInvoice(leader.Nama, leader.Nama, memberOne.Nama, memberTwo.Nama, string(team.Competition)))
 	return id, nil
 }
 

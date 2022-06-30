@@ -12,13 +12,14 @@ import (
 
 func (h HTTPUserDelivery) mapUserBodyToDomain(u httpCommon.AddUser) domainUser.User {
 	user := domainUser.User{
-		ID:       uuid.New(),
-		IdKpm:    uuid.MustParse(u.IdKpm),
-		Nama:     u.Nama,
-		Nim:      u.Nim,
-		Email:    u.Email,
-		Password: u.Password,
-		NoWa:     u.NoWa,
+		ID:         uuid.New(),
+		IdKpm:      uuid.MustParse(u.IdKpm),
+		Nama:       u.Nama,
+		Nim:        u.Nim,
+		Email:      u.Email,
+		Password:   u.Password,
+		University: u.University,
+		NoWa:       u.NoWa,
 		Timestamp: domainUser.Timestamp{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
@@ -35,7 +36,7 @@ func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId string, member1Id uuid.Null
 		IdLeader:    uuid.MustParse(leadId),
 		IdMember1:   member1Id,
 		IdMember2:   member2Id,
-		IdPayment:   t.IdPayment,
+		IdPayment:   uuid.MustParse(t.IdPayment),
 		IsConfirmed: false,
 		Timestamp: domainUser.Timestamp{
 			CreatedAt: time.Now(),
@@ -48,12 +49,13 @@ func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId string, member1Id uuid.Null
 
 func (h HTTPUserDelivery) mapMemberBodyToDomain(m httpCommon.Member) domainMember.Member {
 	member := domainMember.Member{
-		ID:    uuid.New(),
-		IdKpm: m.IdKpm,
-		Nama:  m.Nama,
-		Nim:   m.Nim,
-		Email: m.Email,
-		NoWa:  m.NoWa,
+		ID:         uuid.New(),
+		IdKpm:      uuid.MustParse(m.IdKpm),
+		Nama:       m.Nama,
+		Nim:        m.Nim,
+		Email:      m.Email,
+		University: m.University,
+		NoWa:       m.NoWa,
 		Timestamp: domainUser.Timestamp{
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),

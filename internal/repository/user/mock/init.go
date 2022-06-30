@@ -32,6 +32,12 @@ var _ user.Repository = &RepositoryMock{}
 // 			FindByIDFunc: func(ctx context.Context, id string) (userDomain.User, error) {
 // 				panic("mock out the FindByID method")
 // 			},
+// 			FindMemberByIDFunc: func(ctx context.Context, id string) (memberDomain.Member, error) {
+// 				panic("mock out the FindMemberByID method")
+// 			},
+// 			FindTeamByIDFunc: func(ctx context.Context, id string) (teamDomain.Team, error) {
+// 				panic("mock out the FindTeamByID method")
+// 			},
 // 			InsertFileFunc: func(ctx context.Context, filename string) (string, error) {
 // 				panic("mock out the InsertFile method")
 // 			},
@@ -65,6 +71,12 @@ type RepositoryMock struct {
 
 	// FindByIDFunc mocks the FindByID method.
 	FindByIDFunc func(ctx context.Context, id string) (userDomain.User, error)
+
+	// FindMemberByIDFunc mocks the FindMemberByID method.
+	FindMemberByIDFunc func(ctx context.Context, id string) (memberDomain.Member, error)
+
+	// FindTeamByIDFunc mocks the FindTeamByID method.
+	FindTeamByIDFunc func(ctx context.Context, id string) (teamDomain.Team, error)
 
 	// InsertFileFunc mocks the InsertFile method.
 	InsertFileFunc func(ctx context.Context, filename string) (string, error)
@@ -100,6 +112,20 @@ type RepositoryMock struct {
 		}
 		// FindByID holds details about calls to the FindByID method.
 		FindByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
+		// FindMemberByID holds details about calls to the FindMemberByID method.
+		FindMemberByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
+		// FindTeamByID holds details about calls to the FindTeamByID method.
+		FindTeamByID []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// ID is the id argument value.
@@ -153,6 +179,8 @@ type RepositoryMock struct {
 	lockFindAll             sync.RWMutex
 	lockFindByEmail         sync.RWMutex
 	lockFindByID            sync.RWMutex
+	lockFindMemberByID      sync.RWMutex
+	lockFindTeamByID        sync.RWMutex
 	lockInsertFile          sync.RWMutex
 	lockInsertMember        sync.RWMutex
 	lockInsertTeam          sync.RWMutex
@@ -259,6 +287,76 @@ func (mock *RepositoryMock) FindByIDCalls() []struct {
 	mock.lockFindByID.RLock()
 	calls = mock.calls.FindByID
 	mock.lockFindByID.RUnlock()
+	return calls
+}
+
+// FindMemberByID calls FindMemberByIDFunc.
+func (mock *RepositoryMock) FindMemberByID(ctx context.Context, id string) (memberDomain.Member, error) {
+	if mock.FindMemberByIDFunc == nil {
+		panic("RepositoryMock.FindMemberByIDFunc: method is nil but Repository.FindMemberByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockFindMemberByID.Lock()
+	mock.calls.FindMemberByID = append(mock.calls.FindMemberByID, callInfo)
+	mock.lockFindMemberByID.Unlock()
+	return mock.FindMemberByIDFunc(ctx, id)
+}
+
+// FindMemberByIDCalls gets all the calls that were made to FindMemberByID.
+// Check the length with:
+//     len(mockedRepository.FindMemberByIDCalls())
+func (mock *RepositoryMock) FindMemberByIDCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockFindMemberByID.RLock()
+	calls = mock.calls.FindMemberByID
+	mock.lockFindMemberByID.RUnlock()
+	return calls
+}
+
+// FindTeamByID calls FindTeamByIDFunc.
+func (mock *RepositoryMock) FindTeamByID(ctx context.Context, id string) (teamDomain.Team, error) {
+	if mock.FindTeamByIDFunc == nil {
+		panic("RepositoryMock.FindTeamByIDFunc: method is nil but Repository.FindTeamByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockFindTeamByID.Lock()
+	mock.calls.FindTeamByID = append(mock.calls.FindTeamByID, callInfo)
+	mock.lockFindTeamByID.Unlock()
+	return mock.FindTeamByIDFunc(ctx, id)
+}
+
+// FindTeamByIDCalls gets all the calls that were made to FindTeamByID.
+// Check the length with:
+//     len(mockedRepository.FindTeamByIDCalls())
+func (mock *RepositoryMock) FindTeamByIDCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockFindTeamByID.RLock()
+	calls = mock.calls.FindTeamByID
+	mock.lockFindTeamByID.RUnlock()
 	return calls
 }
 
