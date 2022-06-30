@@ -3,6 +3,7 @@ package http
 import (
 	"net/http"
 	"path/filepath"
+	"strings"
 
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
@@ -23,11 +24,13 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 
 	router.POST("", handler.RegisterUserAccount)
 	router.POST("/uploadkpm", handler.UploadKPM)
+	router.POST("/forgotpassword", handler.ForgotPassword)
 
 	router.Use(httpCommon.MiddlewareJWT(j))
 	router.GET("/activate", handler.ActivateUserAccount)
 	router.POST("/uploadbp", handler.UploadBuktiPembayaran)
 	router.POST("/competition", handler.RegisterCompetition)
+	router.PATCH("/resetpassword", handler.ResetPassword)
 
 	return handler
 }
@@ -46,6 +49,67 @@ func (h HTTPUserDelivery) RegisterUserAccount(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{
+		"data": gin.H{
+			"id": id,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) ForgotPassword(c *gin.Context) {
+	var user httpCommon.UserEmail
+	if err := c.BindJSON(&user); err != nil {
+		c.Error(err).SetType(gin.ErrorTypeBind)
+		return
+	}
+
+	id, err := h.userUsecase.ForgotPassword(c.Request.Context(), user.Email)
+
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{
+		"data": gin.H{
+			"id": id,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) ResetPassword(c *gin.Context) {
+	var requestBody httpCommon.ResetPassword
+	if err := c.BindJSON(&requestBody); err != nil {
+		return
+	}
+
+	inputUserID, ok := c.Get("user_id")
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	userID, ok := inputUserID.(string)
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+
+	inputUserPassword, ok := c.Get("user_password")
+	if !ok {
+		c.Error(ErrorUserPassword)
+		return
+	}
+	userPassword, ok := inputUserPassword.(string)
+	if !ok {
+		c.Error(ErrorUserPassword)
+		return
+	}
+
+	id, err := h.userUsecase.ResetPassword(c.Request.Context(), userID, userPassword, requestBody.NewPassword)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"id": id,
 		},
@@ -86,15 +150,19 @@ func (h HTTPUserDelivery) UploadKPM(c *gin.Context) {
 		c.Error(err)
 		return
 	}
+	ext := strings.Split(file.Filename, ".")
+	extension := ext[len(ext)-1]
 
-	id, err := h.userUsecase.UploadKPM(ctx, file)
-	if err != nil {
+	filename := filepath.Base(uuid.NewString() + "." + extension)
+	if err := c.SaveUploadedFile(file, filename); err != nil {
 		c.Error(err)
 		return
 	}
 
-	filename := filepath.Base(file.Filename)
-	if err := c.SaveUploadedFile(file, filename); err != nil {
+	file.Filename = filename
+
+	id, err := h.userUsecase.UploadKPM(ctx, file)
+	if err != nil {
 		c.Error(err)
 		return
 	}
@@ -115,14 +183,19 @@ func (h HTTPUserDelivery) UploadBuktiPembayaran(c *gin.Context) {
 		return
 	}
 
-	id, err := h.userUsecase.UploadBuktiPembayaran(ctx, file)
-	if err != nil {
+	ext := strings.Split(file.Filename, ".")
+	extension := ext[len(ext)-1]
+
+	filename := filepath.Base(uuid.NewString() + "." + extension)
+	if err := c.SaveUploadedFile(file, filename); err != nil {
 		c.Error(err)
 		return
 	}
 
-	filename := filepath.Base(file.Filename)
-	if err := c.SaveUploadedFile(file, filename); err != nil {
+	file.Filename = filename
+
+	id, err := h.userUsecase.UploadBuktiPembayaran(ctx, file)
+	if err != nil {
 		c.Error(err)
 		return
 	}

@@ -7,14 +7,13 @@ import (
 
 type (
 	Member struct {
-		ID    uuid.UUID
-		IdKpm uuid.UUID
-		Nama  string
-		Nim   string
-		Email string
-		NoWa  string
-
-		IsEmailVerified bool
+		ID         uuid.UUID
+		IdKpm      uuid.UUID
+		Nama       string
+		Nim        string
+		Email      string
+		NoWa       string
+		University string
 
 		Timestamp
 	}

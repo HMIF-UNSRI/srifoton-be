@@ -1,4 +1,4 @@
-include .env.example
+include .env
 
 tidy:
 	go mod tidy

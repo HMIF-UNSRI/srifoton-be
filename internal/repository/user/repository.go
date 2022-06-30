@@ -13,11 +13,12 @@ import (
 
 type Repository interface {
 	InsertUser(ctx context.Context, user userDomain.User) (id string, err error)
-	InsertFile(ctx context.Context) (id string, err error)
+	InsertFile(ctx context.Context, filename string) (id string, err error)
 	InsertTeam(ctx context.Context, team teamDomain.Team) (id string, err error)
 	InsertMember(ctx context.Context, member memberDomain.Member) (id uuid.NullUUID, err error)
 	FindByID(ctx context.Context, id string) (user userDomain.User, err error)
 	FindByEmail(ctx context.Context, email string) (user userDomain.User, err error)
 	FindAll(ctx context.Context) (users userDomain.User, err error)
 	UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error)
+	UpdatePassword(ctx context.Context, id, password string) (rid string, err error)
 }

@@ -32,7 +32,7 @@ var _ user.Repository = &RepositoryMock{}
 // 			FindByIDFunc: func(ctx context.Context, id string) (userDomain.User, error) {
 // 				panic("mock out the FindByID method")
 // 			},
-// 			InsertFileFunc: func(ctx context.Context) (string, error) {
+// 			InsertFileFunc: func(ctx context.Context, filename string) (string, error) {
 // 				panic("mock out the InsertFile method")
 // 			},
 // 			InsertMemberFunc: func(ctx context.Context, member memberDomain.Member) (uuid.NullUUID, error) {
@@ -43,6 +43,9 @@ var _ user.Repository = &RepositoryMock{}
 // 			},
 // 			InsertUserFunc: func(ctx context.Context, user userDomain.User) (string, error) {
 // 				panic("mock out the InsertUser method")
+// 			},
+// 			UpdatePasswordFunc: func(ctx context.Context, id string, password string) (string, error) {
+// 				panic("mock out the UpdatePassword method")
 // 			},
 // 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
 // 				panic("mock out the UpdateVerifiedEmail method")
@@ -64,7 +67,7 @@ type RepositoryMock struct {
 	FindByIDFunc func(ctx context.Context, id string) (userDomain.User, error)
 
 	// InsertFileFunc mocks the InsertFile method.
-	InsertFileFunc func(ctx context.Context) (string, error)
+	InsertFileFunc func(ctx context.Context, filename string) (string, error)
 
 	// InsertMemberFunc mocks the InsertMember method.
 	InsertMemberFunc func(ctx context.Context, member memberDomain.Member) (uuid.NullUUID, error)
@@ -74,6 +77,9 @@ type RepositoryMock struct {
 
 	// InsertUserFunc mocks the InsertUser method.
 	InsertUserFunc func(ctx context.Context, user userDomain.User) (string, error)
+
+	// UpdatePasswordFunc mocks the UpdatePassword method.
+	UpdatePasswordFunc func(ctx context.Context, id string, password string) (string, error)
 
 	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
 	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
@@ -103,6 +109,8 @@ type RepositoryMock struct {
 		InsertFile []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
+			// Filename is the filename argument value.
+			Filename string
 		}
 		// InsertMember holds details about calls to the InsertMember method.
 		InsertMember []struct {
@@ -125,6 +133,15 @@ type RepositoryMock struct {
 			// User is the user argument value.
 			User userDomain.User
 		}
+		// UpdatePassword holds details about calls to the UpdatePassword method.
+		UpdatePassword []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+			// Password is the password argument value.
+			Password string
+		}
 		// UpdateVerifiedEmail holds details about calls to the UpdateVerifiedEmail method.
 		UpdateVerifiedEmail []struct {
 			// Ctx is the ctx argument value.
@@ -140,6 +157,7 @@ type RepositoryMock struct {
 	lockInsertMember        sync.RWMutex
 	lockInsertTeam          sync.RWMutex
 	lockInsertUser          sync.RWMutex
+	lockUpdatePassword      sync.RWMutex
 	lockUpdateVerifiedEmail sync.RWMutex
 }
 
@@ -245,29 +263,33 @@ func (mock *RepositoryMock) FindByIDCalls() []struct {
 }
 
 // InsertFile calls InsertFileFunc.
-func (mock *RepositoryMock) InsertFile(ctx context.Context) (string, error) {
+func (mock *RepositoryMock) InsertFile(ctx context.Context, filename string) (string, error) {
 	if mock.InsertFileFunc == nil {
 		panic("RepositoryMock.InsertFileFunc: method is nil but Repository.InsertFile was just called")
 	}
 	callInfo := struct {
-		Ctx context.Context
+		Ctx      context.Context
+		Filename string
 	}{
-		Ctx: ctx,
+		Ctx:      ctx,
+		Filename: filename,
 	}
 	mock.lockInsertFile.Lock()
 	mock.calls.InsertFile = append(mock.calls.InsertFile, callInfo)
 	mock.lockInsertFile.Unlock()
-	return mock.InsertFileFunc(ctx)
+	return mock.InsertFileFunc(ctx, filename)
 }
 
 // InsertFileCalls gets all the calls that were made to InsertFile.
 // Check the length with:
 //     len(mockedRepository.InsertFileCalls())
 func (mock *RepositoryMock) InsertFileCalls() []struct {
-	Ctx context.Context
+	Ctx      context.Context
+	Filename string
 } {
 	var calls []struct {
-		Ctx context.Context
+		Ctx      context.Context
+		Filename string
 	}
 	mock.lockInsertFile.RLock()
 	calls = mock.calls.InsertFile
@@ -377,6 +399,45 @@ func (mock *RepositoryMock) InsertUserCalls() []struct {
 	mock.lockInsertUser.RLock()
 	calls = mock.calls.InsertUser
 	mock.lockInsertUser.RUnlock()
+	return calls
+}
+
+// UpdatePassword calls UpdatePasswordFunc.
+func (mock *RepositoryMock) UpdatePassword(ctx context.Context, id string, password string) (string, error) {
+	if mock.UpdatePasswordFunc == nil {
+		panic("RepositoryMock.UpdatePasswordFunc: method is nil but Repository.UpdatePassword was just called")
+	}
+	callInfo := struct {
+		Ctx      context.Context
+		ID       string
+		Password string
+	}{
+		Ctx:      ctx,
+		ID:       id,
+		Password: password,
+	}
+	mock.lockUpdatePassword.Lock()
+	mock.calls.UpdatePassword = append(mock.calls.UpdatePassword, callInfo)
+	mock.lockUpdatePassword.Unlock()
+	return mock.UpdatePasswordFunc(ctx, id, password)
+}
+
+// UpdatePasswordCalls gets all the calls that were made to UpdatePassword.
+// Check the length with:
+//     len(mockedRepository.UpdatePasswordCalls())
+func (mock *RepositoryMock) UpdatePasswordCalls() []struct {
+	Ctx      context.Context
+	ID       string
+	Password string
+} {
+	var calls []struct {
+		Ctx      context.Context
+		ID       string
+		Password string
+	}
+	mock.lockUpdatePassword.RLock()
+	calls = mock.calls.UpdatePassword
+	mock.lockUpdatePassword.RUnlock()
 	return calls
 }
 

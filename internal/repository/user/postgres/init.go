@@ -22,12 +22,13 @@ func NewPostgresUserRepositoryImpl(db *sql.DB) postgresUserRepositoryImpl {
 }
 
 func (repository postgresUserRepositoryImpl) InsertUser(ctx context.Context, user userDomain.User) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(id_kpm, nama, nim, email, password, no_wa) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id;",
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(id_kpm, nama, nim, email, password, university,no_wa) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;",
 		user.IdKpm,
 		user.Nama,
 		user.Nim,
 		user.Email,
 		user.Password,
+		user.University,
 		user.NoWa,
 	)
 	err = row.Scan(&id)
@@ -71,9 +72,9 @@ func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Con
 	return id, err
 }
 
-func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context) (id string, err error) {
+func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context, filename string) (id string, err error) {
 	row := repository.db.QueryRowContext(ctx, "INSERT INTO uploads(file_name) VALUES ($1) RETURNING id;",
-		uuid.NewString(),
+		filename,
 	)
 
 	err = row.Scan(&id)
@@ -105,17 +106,27 @@ func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, tea
 }
 
 func (repository postgresUserRepositoryImpl) InsertMember(ctx context.Context, member memberDomain.Member) (id uuid.NullUUID, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO members(id_kpm, nama, nim, email, no_wa) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO members(id_kpm, nama, nim, email, university, no_wa) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		member.IdKpm,
 		member.Nama,
 		member.Nim,
 		member.Email,
+		member.University,
 		member.NoWa,
 	)
 
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("member not found")
+	}
+	return id, err
+}
+
+func (repository postgresUserRepositoryImpl) UpdatePassword(ctx context.Context, id, password string) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET password = $1 WHERE id = $2 RETURNING id;", password, id)
+	err = row.Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return id, errorCommon.NewNotFoundError("user not found")
 	}
 	return id, err
 }

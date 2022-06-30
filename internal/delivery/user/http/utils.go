@@ -13,7 +13,7 @@ import (
 func (h HTTPUserDelivery) mapUserBodyToDomain(u httpCommon.AddUser) domainUser.User {
 	user := domainUser.User{
 		ID:       uuid.New(),
-		IdKpm:    u.IdKpm,
+		IdKpm:    uuid.MustParse(u.IdKpm),
 		Nama:     u.Nama,
 		Nim:      u.Nim,
 		Email:    u.Email,

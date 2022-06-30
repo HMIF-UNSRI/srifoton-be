@@ -1,6 +1,6 @@
 
 CREATE TYPE role_type AS ENUM ('BASE', 'ADMIN');
-CREATE TYPE competition_type AS ENUM ('CP', 'WEB','UI/UX');
+CREATE TYPE competition_type AS ENUM ('CP', 'WEB','UI/UX','ESPORT');
 
 CREATE TABLE IF NOT EXISTS uploads
 (
@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS users
     nim               varchar(255)     NOT NULL UNIQUE,
     email             varchar(255)     NOT NULL UNIQUE,
     password          varchar(255)     NOT NULL,
+    university        varchar(255)     NOT NULL,
     role              role_type        NOT NULL DEFAULT 'BASE',
     is_email_verified bool             NOT NULL DEFAULT FALSE,
     no_wa             varchar(255)     NOT NULL,
@@ -32,6 +33,7 @@ CREATE TABLE IF NOT EXISTS members
     nama       varchar(255)     NOT NULL,
     nim        varchar(255)     NOT NULL,
     email      varchar(255)     NOT NULL UNIQUE,
+    university varchar(255)     NOT NULL,
     no_wa      varchar(255)     NOT NULL,
     created_at timestamp        NOT NULL DEFAULT (NOW()),
     updated_at timestamp        NOT NULL DEFAULT (NOW())

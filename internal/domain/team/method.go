@@ -12,5 +12,7 @@ func (t *Team) SetTeamCompetitionString(c string) {
 		t.Competition = Web
 	case string(UiUx):
 		t.Competition = UiUx
+	case string(Esport):
+		t.Competition = Esport
 	}
 }

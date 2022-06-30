@@ -7,21 +7,21 @@ import (
 
 type (
 	User struct {
-		ID       uuid.UUID
-		IdKpm    uuid.UUID
-		Nama     string
-		Nim      string
-		Email    string
-		Password string
-		NoWa     string
-		Role     role
+		ID         uuid.UUID
+		IdKpm      uuid.UUID
+		Nama       string
+		Nim        string
+		Email      string
+		Password   string
+		University string
+		NoWa       string
+		Role       role
 
 		IsEmailVerified bool
 
 		Timestamp
 	}
 
-	role string
-
+	role      string
 	Timestamp = domain.Timestamp
 )

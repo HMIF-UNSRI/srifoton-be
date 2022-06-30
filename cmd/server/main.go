@@ -19,6 +19,7 @@ import (
 
 func main() {
 	cfg := env.LoadConfig()
+	fmt.Println(cfg)
 	db := dbCommon.NewPostgres(cfg.PostgresURL)
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()

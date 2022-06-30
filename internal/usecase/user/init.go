@@ -74,7 +74,7 @@ func (usecase userUsecaseImpl) UploadKPM(ctx context.Context, file *multipart.Fi
 		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
 	}
 
-	id, err = usecase.userRepository.InsertFile(ctx)
+	id, err = usecase.userRepository.InsertFile(ctx, file.Filename)
 	if err != nil {
 		return "", errorCommon.NewInvariantError("There's something wrong")
 	}
@@ -89,11 +89,53 @@ func (usecase userUsecaseImpl) UploadBuktiPembayaran(ctx context.Context, file *
 		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
 	}
 
-	id, err = usecase.userRepository.InsertFile(ctx)
+	id, err = usecase.userRepository.InsertFile(ctx, file.Filename)
 	if err != nil {
 		return "", errorCommon.NewInvariantError("There's something wrong")
 	}
 	return id, nil
+}
+
+func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string) (id string, err error) {
+	user, err := usecase.userRepository.FindByEmail(ctx, email)
+	if err != nil {
+		return id, err
+	}
+
+	// Prevent sending spam emails
+	if !user.IsEmailVerified {
+		return id, errorCommon.NewNotFoundError("user not found")
+	}
+
+	token, err := usecase.jwtManager.GenerateToken(user.ID.String(), user.Password, time.Hour*24)
+	if err != nil {
+		return id, err
+	}
+
+	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password",
+		mailCommon.TextResetPassword(token))
+
+	return user.ID.String(), err
+}
+
+func (usecase userUsecaseImpl) ResetPassword(ctx context.Context, id, oldPassword, newPassword string) (rid string, err error) {
+	user, err := usecase.userRepository.FindByID(ctx, id)
+	if err != nil {
+		return rid, err
+	}
+
+	// Compare password between db and jwt
+	if user.Password != oldPassword {
+		return rid, errorCommon.NewForbiddenError("wrong password")
+	}
+
+	hashPassword, err := usecase.passwordManager.HashPassword(newPassword)
+	if err != nil {
+		return id, err
+	}
+
+	return usecase.userRepository.UpdatePassword(ctx, id, hashPassword)
 }
 
 func (usecase userUsecaseImpl) GetMailActivation(ctx context.Context, email string) (err error) {
@@ -105,13 +147,13 @@ func (usecase userUsecaseImpl) GetMailActivation(ctx context.Context, email stri
 	if user.IsEmailVerified {
 		return errorCommon.NewInvariantError("email already verified")
 	}
-	token, err := usecase.jwtManager.GenerateToken(user.ID.String(), time.Hour*24*30)
+	token, err := usecase.jwtManager.GenerateToken(user.ID.String(), "", time.Hour*24*30)
 	if err != nil {
 		return err
 	}
 
 	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation",
-		mailCommon.TextRegisterCompletion(user.Email, token))
+		mailCommon.TextRegisterCompletion(user.Nama, token))
 
 	return err
 }

@@ -48,7 +48,7 @@ client.test("Register User Validation Password Required", function() {
 ### Register Confirmation
 GET http://localhost:8000/api/users/activate
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgyZmZkZGE1LTgxYWYtNGY5NC1hNTdiLWQzMjNjMWY2ODBlOSIsImV4cCI6MTY1NTcyNjQxN30.l4niLw-YPBMEjPPQ4qYbubgywvoUkrlPjWhLieUNiE4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxNDlkOWZkLWRjMzQtNDc1Mi1iMTlmLWM4NTc2NWM5YTNkOCIsImV4cCI6MTY1Nzg5NzMzNH0.qnxrtQODk3qJqsk-jmbhG7TNx_GiUmlWkt6kRRn0czg
 
 ### Login User Success
 POST http://localhost:8000/api/auth

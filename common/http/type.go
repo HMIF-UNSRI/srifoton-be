@@ -23,11 +23,12 @@ type (
 	}
 
 	Member struct {
-		IdKpm uuid.UUID `json:"id" binding:"required_with=Nama Nim Email NoWa"`
+		IdKpm uuid.UUID `json:"id_kpm" binding:"required_with=Nama Nim Email NoWa"`
 		Nama  string    `json:"nama" binding:"required_with=IdKpm"`
 		Nim   string    `json:"nim" binding:"required_with=IdKpm"`
 		Email string    `json:"email" binding:"required_with=IdKpm"`
 		NoWa  string    `json:"no_wa" binding:"required_with=IdKpm"`
+		// University
 	}
 
 	Team struct {
@@ -39,14 +40,23 @@ type (
 
 	AddUser struct {
 		// ID       string `json:"id"`
-		IdKpm    uuid.UUID `json:"id" binding:"required"`
-		Nama     string    `json:"nama" binding:"required"`
-		Nim      string    `json:"nim" binding:"required"`
-		Email    string    `json:"email" binding:"required,email"`
-		Password string    `json:"password" binding:"required,gte=8,lte=16"`
-		NoWa     string    `json:"no_wa" binding:"required"`
-		Role     string    `json:"role"`
+		IdKpm      string `json:"id_kpm" binding:"required"`
+		Nama       string `json:"name" binding:"required"`
+		Nim        string `json:"nim" binding:"required"`
+		Email      string `json:"email" binding:"required,email"`
+		Password   string `json:"password" binding:"required,gte=8,lte=16"`
+		NoWa       string `json:"no_wa" binding:"required"`
+		University string `json:"university" binding:"required"`
+		Role       string `json:"role"`
 		// CreatedAt time.Time `json:"created_at"`
 		// UpdatedAt time.Time `json:"updated_at"`
+	}
+
+	UserEmail struct {
+		Email string `json:"email" binding:"required, email"`
+	}
+
+	ResetPassword struct {
+		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
 	}
 )
