@@ -17,6 +17,7 @@ type Repository interface {
 	InsertTeam(ctx context.Context, team teamDomain.Team) (id string, err error)
 	InsertMember(ctx context.Context, member memberDomain.Member) (id uuid.NullUUID, err error)
 	FindByID(ctx context.Context, id string) (user userDomain.User, err error)
+	FindUserByNim(ctx context.Context, nim string) (user userDomain.User, err error)
 	FindTeamByID(ctx context.Context, id string) (team teamDomain.Team, err error)
 	FindMemberByID(ctx context.Context, id string) (member memberDomain.Member, err error)
 	FindByEmail(ctx context.Context, email string) (user userDomain.User, err error)

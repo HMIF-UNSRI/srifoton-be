@@ -7,12 +7,12 @@ func (t *Team) GetUCompetitionTypeString() string {
 func (t *Team) SetTeamCompetitionString(c string) {
 	switch c {
 	case string(Cp):
-		t.Competition = Cp
+		t.Competition = "Competitive Programming"
 	case string(Web):
-		t.Competition = Web
+		t.Competition = "Web Development"
 	case string(UiUx):
-		t.Competition = UiUx
+		t.Competition = "UI/UX Design"
 	case string(Esport):
-		t.Competition = Esport
+		t.Competition = "E-Sport"
 	}
 }

@@ -1,4 +1,3 @@
-
 CREATE TYPE role_type AS ENUM ('BASE', 'ADMIN');
 CREATE TYPE competition_type AS ENUM ('CP', 'WEB','UI/UX','ESPORT');
 

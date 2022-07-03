@@ -48,9 +48,11 @@ func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId string, member1Id uuid.Null
 }
 
 func (h HTTPUserDelivery) mapMemberBodyToDomain(m httpCommon.Member) domainMember.Member {
+	idKpm, _ := uuid.Parse(m.IdKpm)
+
 	member := domainMember.Member{
 		ID:         uuid.New(),
-		IdKpm:      uuid.MustParse(m.IdKpm),
+		IdKpm:      idKpm,
 		Nama:       m.Nama,
 		Nim:        m.Nim,
 		Email:      m.Email,

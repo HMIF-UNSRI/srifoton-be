@@ -3,6 +3,9 @@ package mail
 import (
 	"bytes"
 	"html/template"
+	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -22,13 +25,32 @@ func TextResetPassword(token string) string {
 }
 
 func TextInvoice(teamName, leader, memberOne, memberTwo, competition string) string {
+	var price string
+	id := ""
+	switch competition {
+	case "Competitive Programming":
+		id += "A" + strconv.Itoa((rand.Intn(10-0) + 0))
+		price = "100000"
+	case "UI/UX Design":
+		id += "B" + strconv.Itoa((rand.Intn(20-11) + 11))
+		price = "80000"
+	case "Web Development":
+		id += "C" + strconv.Itoa((rand.Intn(30-21) + 21))
+		price = "60000"
+	case "E-Sport":
+		id += "B" + strconv.Itoa((rand.Intn(40-31) + 31))
+		price = "50000"
+	}
+	id += string(leader[0]+memberOne[0]+memberTwo[0]) + strconv.Itoa((rand.Intn(9)))
+	id = strings.ToUpper(id)
+
 	service := InvoiceService{
-		ID:          "ASDAASD",
+		ID:          id,
 		TeamName:    teamName,
 		Competition: competition,
 		Members:     []string{leader, memberOne, memberTwo},
-		Price:       "50000",
-		Date:        time.Now(),
+		Price:       price,
+		Date:        time.Now().Format("2006 January 02 15:04:05"),
 	}
 	return ParseInvoiceTemplate(service)
 }

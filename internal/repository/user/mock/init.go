@@ -38,6 +38,9 @@ var _ user.Repository = &RepositoryMock{}
 // 			FindTeamByIDFunc: func(ctx context.Context, id string) (teamDomain.Team, error) {
 // 				panic("mock out the FindTeamByID method")
 // 			},
+// 			FindUserByNimFunc: func(ctx context.Context, nim string) (userDomain.User, error) {
+// 				panic("mock out the FindUserByNim method")
+// 			},
 // 			InsertFileFunc: func(ctx context.Context, filename string) (string, error) {
 // 				panic("mock out the InsertFile method")
 // 			},
@@ -77,6 +80,9 @@ type RepositoryMock struct {
 
 	// FindTeamByIDFunc mocks the FindTeamByID method.
 	FindTeamByIDFunc func(ctx context.Context, id string) (teamDomain.Team, error)
+
+	// FindUserByNimFunc mocks the FindUserByNim method.
+	FindUserByNimFunc func(ctx context.Context, nim string) (userDomain.User, error)
 
 	// InsertFileFunc mocks the InsertFile method.
 	InsertFileFunc func(ctx context.Context, filename string) (string, error)
@@ -131,6 +137,13 @@ type RepositoryMock struct {
 			// ID is the id argument value.
 			ID string
 		}
+		// FindUserByNim holds details about calls to the FindUserByNim method.
+		FindUserByNim []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// Nim is the nim argument value.
+			Nim string
+		}
 		// InsertFile holds details about calls to the InsertFile method.
 		InsertFile []struct {
 			// Ctx is the ctx argument value.
@@ -181,6 +194,7 @@ type RepositoryMock struct {
 	lockFindByID            sync.RWMutex
 	lockFindMemberByID      sync.RWMutex
 	lockFindTeamByID        sync.RWMutex
+	lockFindUserByNim       sync.RWMutex
 	lockInsertFile          sync.RWMutex
 	lockInsertMember        sync.RWMutex
 	lockInsertTeam          sync.RWMutex
@@ -357,6 +371,41 @@ func (mock *RepositoryMock) FindTeamByIDCalls() []struct {
 	mock.lockFindTeamByID.RLock()
 	calls = mock.calls.FindTeamByID
 	mock.lockFindTeamByID.RUnlock()
+	return calls
+}
+
+// FindUserByNim calls FindUserByNimFunc.
+func (mock *RepositoryMock) FindUserByNim(ctx context.Context, nim string) (userDomain.User, error) {
+	if mock.FindUserByNimFunc == nil {
+		panic("RepositoryMock.FindUserByNimFunc: method is nil but Repository.FindUserByNim was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		Nim string
+	}{
+		Ctx: ctx,
+		Nim: nim,
+	}
+	mock.lockFindUserByNim.Lock()
+	mock.calls.FindUserByNim = append(mock.calls.FindUserByNim, callInfo)
+	mock.lockFindUserByNim.Unlock()
+	return mock.FindUserByNimFunc(ctx, nim)
+}
+
+// FindUserByNimCalls gets all the calls that were made to FindUserByNim.
+// Check the length with:
+//     len(mockedRepository.FindUserByNimCalls())
+func (mock *RepositoryMock) FindUserByNimCalls() []struct {
+	Ctx context.Context
+	Nim string
+} {
+	var calls []struct {
+		Ctx context.Context
+		Nim string
+	}
+	mock.lockFindUserByNim.RLock()
+	calls = mock.calls.FindUserByNim
+	mock.lockFindUserByNim.RUnlock()
 	return calls
 }
 

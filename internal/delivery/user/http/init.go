@@ -24,14 +24,15 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 	handler := HTTPUserDelivery{userUsecase: userUsecase}
 
 	router.POST("", handler.RegisterUserAccount)
-	router.POST("/uploadkpm", handler.UploadKPM)
-	router.POST("/forgotpassword", handler.ForgotPassword)
+	router.POST("/uploads/kpm", handler.UploadKPM)
+	router.POST("/forgot-password", handler.ForgotPassword)
 
 	router.Use(httpCommon.MiddlewareJWT(j))
-	router.POST("/uploadbp", handler.UploadBuktiPembayaran)
+	router.POST("/uploads/bp", handler.UploadBuktiPembayaran)
 	router.GET("/activate/:token", handler.ActivateUserAccount)
+	router.POST("/reset-password/:token", handler.ResetPassword)
 	router.POST("/competition", handler.RegisterCompetition)
-	router.PATCH("/resetpassword", handler.ResetPassword)
+	router.PATCH("/reset-password", handler.ResetPassword)
 
 	return handler
 }

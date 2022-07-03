@@ -27,7 +27,7 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 	}
 
 	if !user.IsEmailVerified {
-		return accessToken, errorCommon.NewNotFoundError("user not found")
+		return accessToken, errorCommon.NewNotFoundError("please verified your email")
 	}
 
 	if err := a.passwordManager.CheckPasswordHash(password, user.Password); err != nil {

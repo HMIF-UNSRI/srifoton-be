@@ -1,7 +1,5 @@
 package mail
 
-import "time"
-
 type (
 	InvoiceService struct {
 		ID          string
@@ -9,7 +7,7 @@ type (
 		Members     []string
 		Competition string
 		Price       string
-		Date        time.Time
+		Date        string
 	}
 
 	RegisterService struct {

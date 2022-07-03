@@ -22,7 +22,7 @@ type (
 
 	Member struct {
 		IdKpm      string `json:"id_kpm" binding:"required_with=Nama Nim Email NoWa university"`
-		Nama       string `json:"nama" binding:"required_with=IdKpm"`
+		Nama       string `json:"name" binding:"required_with=IdKpm"`
 		Nim        string `json:"nim" binding:"required_with=IdKpm"`
 		Email      string `json:"email" binding:"required_with=IdKpm"`
 		NoWa       string `json:"no_wa" binding:"required_with=IdKpm"`

@@ -35,6 +35,12 @@ func (usecase userUsecaseImpl) CreateAccount(ctx context.Context, user userDomai
 	if err == nil {
 		return id, errorCommon.NewInvariantError("email already exist")
 	}
+
+	_, err = usecase.userRepository.FindUserByNim(ctx, user.Nim)
+	if err == nil {
+		return id, errorCommon.NewInvariantError("nim already exist")
+	}
+
 	hashPassword, err := usecase.passwordManager.HashPassword(user.Password)
 	if err != nil {
 		return id, err
@@ -67,20 +73,27 @@ func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team tea
 		return "", errorCommon.NewInvariantError(err.Error())
 	}
 	leader, err = usecase.userRepository.FindByID(ctx, team.IdLeader.String())
+
 	if err != nil {
-		return "", errorCommon.NewInvariantError(err.Error())
+		return "", errorCommon.NewInvariantError("user not found")
 	}
-	memberOne, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember1.UUID.String())
-	if err != nil {
-		return "", errorCommon.NewInvariantError(err.Error())
+
+	if team.IdMember1.Valid {
+		memberOne, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember1.UUID.String())
+		if err != nil {
+			return "", errorCommon.NewInvariantError("member one not found")
+		}
 	}
-	memberTwo, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember2.UUID.String())
-	if err != nil {
-		return "", errorCommon.NewInvariantError(err.Error())
+
+	if team.IdMember2.Valid {
+		memberTwo, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember2.UUID.String())
+		if err != nil {
+			return "", errorCommon.NewInvariantError("member two not found")
+		}
 	}
 
 	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(leader.Nama, leader.Nama, memberOne.Nama, memberTwo.Nama, string(team.Competition)))
+		mailCommon.TextInvoice(team.TeamName, leader.Nama, memberOne.Nama, memberTwo.Nama, string(team.Competition)))
 	return id, nil
 }
 
@@ -88,8 +101,8 @@ func (usecase userUsecaseImpl) UploadKPM(ctx context.Context, file *multipart.Fi
 	ext := strings.Split(file.Filename, ".")
 	extension := ext[len(ext)-1]
 
-	if extension != "png" {
-		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
+	if extension != "png" && extension != "jpg" && extension != "pdf" && extension != "jpeg" {
+		return "", errorCommon.NewForbiddenError("Only PNG, JPEG, JPG or PDF extension is supported")
 	}
 
 	id, err = usecase.userRepository.InsertFile(ctx, file.Filename)
@@ -103,8 +116,8 @@ func (usecase userUsecaseImpl) UploadBuktiPembayaran(ctx context.Context, file *
 	ext := strings.Split(file.Filename, ".")
 	extension := ext[len(ext)-1]
 
-	if extension != "png" {
-		return "", errorCommon.NewForbiddenError("Only PNG extension is supported")
+	if extension != "png" && extension != "jpg" && extension != "pdf" && extension != "jpeg" {
+		return "", errorCommon.NewForbiddenError("Only PNG, JPEG, JPG or PDF extension is supported")
 	}
 
 	id, err = usecase.userRepository.InsertFile(ctx, file.Filename)

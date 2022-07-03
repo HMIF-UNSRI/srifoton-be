@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
@@ -78,6 +77,16 @@ func (repository postgresUserRepositoryImpl) FindByEmail(ctx context.Context, em
 	return user, err
 }
 
+func (repository postgresUserRepositoryImpl) FindUserByNim(ctx context.Context, nim string) (user userDomain.User, err error) {
+	row := repository.db.QueryRowContext(ctx, "SELECT id, nama, email, password, role, is_email_verified FROM users WHERE nim = $1 LIMIT 1;", nim)
+
+	err = row.Scan(&user.ID, &user.Nama, &user.Email, &user.Password, &user.Role, &user.IsEmailVerified)
+	if errors.Is(err, sql.ErrNoRows) {
+		return user, errorCommon.NewNotFoundError("user not found")
+	}
+	return user, err
+}
+
 func (repository postgresUserRepositoryImpl) FindAll(ctx context.Context) (users userDomain.User, err error) {
 	//TODO: implement me
 	panic("implement me")
@@ -105,7 +114,7 @@ func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context, fil
 }
 
 func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, team teamDomain.Team) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(team_name ,id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5) RETURNING id",
+	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(team_name ,id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
 		team.TeamName,
 		team.IdLeader,
 		team.Competition,
@@ -122,7 +131,6 @@ func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, tea
 	if err != nil {
 		return id, errorCommon.NewNotFoundError(err.Error())
 	}
-	fmt.Println("Inserted")
 	return id, err
 }
 
