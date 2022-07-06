@@ -4,6 +4,7 @@ import (
 	"context"
 	"mime/multipart"
 
+	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
 	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
@@ -18,6 +19,9 @@ type Usecase interface {
 	RegisterCompetition(ctx context.Context, t teamDomain.Team) (id string, err error)
 	ForgotPassword(ctx context.Context, email string) (id string, err error)
 	ResetPassword(ctx context.Context, id, oldPassword, newPassword string) (rid string, err error)
+	GetById(ctx context.Context, id string) (user httpCommon.UserResponse, err error)
+	GetTeamById(ctx context.Context, id string) (members httpCommon.TeamResponse, err error)
+	DeleteMemberByID(ctx context.Context, id string) (err error)
 
 	// Usecase to handle uploaded file (KPM & Bukti Pembayaran)
 	UploadKPM(ctx context.Context, file *multipart.FileHeader) (id string, err error)

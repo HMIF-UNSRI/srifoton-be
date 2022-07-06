@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS teams
 (
     id           uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     team_name    varchar(255)     NOT NULL,
-    id_lead      uuid             NOT NULL REFERENCES users,
+    id_lead      uuid             NOT NULL UNIQUE REFERENCES users,
     competition  competition_type NOT NULL,
     id_member_1  uuid REFERENCES members,
     id_member_2  uuid REFERENCES members,

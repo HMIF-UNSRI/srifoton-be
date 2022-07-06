@@ -22,6 +22,7 @@ type Repository interface {
 	FindMemberByID(ctx context.Context, id string) (member memberDomain.Member, err error)
 	FindByEmail(ctx context.Context, email string) (user userDomain.User, err error)
 	FindAll(ctx context.Context) (users userDomain.User, err error)
+	DeleteMemberByID(ctx context.Context, id string) (err error)
 	UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error)
 	UpdatePassword(ctx context.Context, id, password string) (rid string, err error)
 }

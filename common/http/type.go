@@ -58,4 +58,18 @@ type (
 	ResetPassword struct {
 		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
 	}
+
+	UserResponse struct {
+		Name       string `json:"name"`
+		Nim        string `json:"nim"`
+		Email      string `json:"email"`
+		NoWa       string `json:"no_wa"`
+		University string `json:"university"`
+	}
+
+	TeamResponse struct {
+		TeamName    string         `json:"team_name"`
+		Competition string         `json:"competition_name"`
+		Members     []UserResponse `json:"members"`
+	}
 )

@@ -2,11 +2,14 @@ package mail
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 )
 
 func TextRegisterCompletion(nama, token string) string {
@@ -24,30 +27,31 @@ func TextResetPassword(token string) string {
 	return ParseForgotPasswordTemplate(service)
 }
 
-func TextInvoice(teamName, leader, memberOne, memberTwo, competition string) string {
+func TextInvoice(team teamDomain.Team, leader, memberOne, memberTwo string) string {
 	var price string
 	id := ""
-	switch competition {
-	case "Competitive Programming":
+	fmt.Println(string(team.Competition))
+	switch string(team.Competition) {
+	case "CP":
 		id += "A" + strconv.Itoa((rand.Intn(10-0) + 0))
 		price = "100000"
-	case "UI/UX Design":
+	case "UI/UX":
 		id += "B" + strconv.Itoa((rand.Intn(20-11) + 11))
 		price = "80000"
-	case "Web Development":
+	case "WEB":
 		id += "C" + strconv.Itoa((rand.Intn(30-21) + 21))
 		price = "60000"
-	case "E-Sport":
+	case "ESPORT":
 		id += "B" + strconv.Itoa((rand.Intn(40-31) + 31))
 		price = "50000"
 	}
-	id += string(leader[0]+memberOne[0]+memberTwo[0]) + strconv.Itoa((rand.Intn(9)))
+	id += string(team.ID.String()[0]) + strconv.Itoa((rand.Intn(9)))
 	id = strings.ToUpper(id)
 
 	service := InvoiceService{
 		ID:          id,
-		TeamName:    teamName,
-		Competition: competition,
+		TeamName:    team.TeamName,
+		Competition: team.GetUCompetitionTypeString(),
 		Members:     []string{leader, memberOne, memberTwo},
 		Price:       price,
 		Date:        time.Now().Format("2006 January 02 15:04:05"),

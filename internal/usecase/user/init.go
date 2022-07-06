@@ -7,6 +7,7 @@ import (
 	"time"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
+	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
@@ -59,9 +60,17 @@ func (usecase userUsecaseImpl) CreateAccount(ctx context.Context, user userDomai
 func (usecase userUsecaseImpl) CreateMember(ctx context.Context, m memberDomain.Member) (id uuid.NullUUID, err error) {
 	id, err = usecase.userRepository.InsertMember(ctx, m)
 	if err != nil {
-		return id, errorCommon.NewInvariantError("There's something wrong")
+		return id, errorCommon.NewInvariantError("unable to create member")
 	}
 	return id, nil
+}
+
+func (usecase userUsecaseImpl) DeleteMemberByID(ctx context.Context, id string) (err error) {
+	err = usecase.userRepository.DeleteMemberByID(ctx, id)
+	if err != nil {
+		return errorCommon.NewInvariantError(err.Error())
+	}
+	return nil
 }
 
 func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team teamDomain.Team) (id string, err error) {
@@ -92,8 +101,10 @@ func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team tea
 		}
 	}
 
+	team, _ = usecase.userRepository.FindTeamByID(ctx, leader.ID.String())
+
 	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(team.TeamName, leader.Nama, memberOne.Nama, memberTwo.Nama, string(team.Competition)))
+		mailCommon.TextInvoice(team, leader.Nama, memberOne.Nama, memberTwo.Nama))
 	return id, nil
 }
 
@@ -201,4 +212,59 @@ func (usecase userUsecaseImpl) Activate(ctx context.Context, id string) (rid str
 
 	rid, err = usecase.userRepository.UpdateVerifiedEmail(ctx, id)
 	return rid, err
+}
+
+func (usecase userUsecaseImpl) GetById(ctx context.Context, id string) (user httpCommon.UserResponse, err error) {
+	userDB, err := usecase.userRepository.FindByID(ctx, id)
+	if err != nil {
+		return user, err
+	}
+	user = httpCommon.UserResponse{
+		Name:       userDB.Nama,
+		Nim:        userDB.Nim,
+		Email:      userDB.Email,
+		University: userDB.University,
+		NoWa:       userDB.NoWa,
+	}
+
+	return user, err
+
+}
+
+func (usecase userUsecaseImpl) GetTeamById(ctx context.Context, id string) (members httpCommon.TeamResponse, err error) {
+	teamDB, err := usecase.userRepository.FindTeamByID(ctx, id)
+	if err != nil {
+		return members, err
+	}
+
+	var member_1 httpCommon.UserResponse
+	if teamDB.IdMember1.Valid {
+		memberDB, _ := usecase.userRepository.FindMemberByID(ctx, teamDB.IdMember1.UUID.String())
+		member_1.Name = memberDB.Nama
+		member_1.Nim = memberDB.Nim
+		member_1.Email = memberDB.Email
+		member_1.NoWa = memberDB.NoWa
+		member_1.University = memberDB.University
+	}
+
+	var member_2 httpCommon.UserResponse
+	if teamDB.IdMember2.Valid {
+		memberDB, _ := usecase.userRepository.FindMemberByID(ctx, teamDB.IdMember2.UUID.String())
+		member_2.Name = memberDB.Nama
+		member_2.Nim = memberDB.Nim
+		member_2.Email = memberDB.Email
+		member_2.NoWa = memberDB.NoWa
+		member_2.University = memberDB.University
+	}
+
+	members = httpCommon.TeamResponse{
+		TeamName:    teamDB.TeamName,
+		Competition: teamDB.GetUCompetitionTypeString(),
+		Members: []httpCommon.UserResponse{
+			member_1,
+			member_2,
+		},
+	}
+
+	return members, err
 }

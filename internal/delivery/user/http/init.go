@@ -1,7 +1,6 @@
 package http
 
 import (
-	"fmt"
 	"net/http"
 	"path/filepath"
 	"strings"
@@ -28,9 +27,11 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 	router.POST("/forgot-password", handler.ForgotPassword)
 
 	router.Use(httpCommon.MiddlewareJWT(j))
+	router.GET("", handler.GetUserById)
+	router.GET("/team", handler.GetTeamById)
 	router.POST("/uploads/bp", handler.UploadBuktiPembayaran)
 	router.GET("/activate/:token", handler.ActivateUserAccount)
-	router.POST("/reset-password/:token", handler.ResetPassword)
+	router.POST("/reset-password", handler.ResetPassword)
 	router.POST("/competition", handler.RegisterCompetition)
 	router.PATCH("/reset-password", handler.ResetPassword)
 
@@ -131,8 +132,6 @@ func (h HTTPUserDelivery) ActivateUserAccount(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
-	fmt.Println(userID)
-
 	id, err := h.userUsecase.Activate(ctx, userID)
 	if err != nil {
 		c.Error(err)
@@ -142,6 +141,58 @@ func (h HTTPUserDelivery) ActivateUserAccount(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"data": gin.H{
 			"id": id,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) GetUserById(c *gin.Context) {
+	inputUserID, ok := c.Get("user_id")
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	userID, ok := inputUserID.(string)
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	ctx := c.Request.Context()
+	user, err := h.userUsecase.GetById(ctx, userID)
+
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"user": user,
+		},
+	})
+}
+
+func (h HTTPUserDelivery) GetTeamById(c *gin.Context) {
+	inputUserID, ok := c.Get("user_id")
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	userID, ok := inputUserID.(string)
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	ctx := c.Request.Context()
+	team, err := h.userUsecase.GetTeamById(ctx, userID)
+
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"team": team,
 		},
 	})
 }
@@ -232,6 +283,7 @@ func (h HTTPUserDelivery) RegisterCompetition(c *gin.Context) {
 		var err error
 		member1Id, err = h.userUsecase.CreateMember(ctx, h.mapMemberBodyToDomain(requestBody.Member1))
 		if err != nil {
+			h.userUsecase.DeleteMemberByID(ctx, member1Id.UUID.String())
 			c.Error(err)
 			return
 		}
@@ -241,6 +293,8 @@ func (h HTTPUserDelivery) RegisterCompetition(c *gin.Context) {
 		var err error
 		member2Id, err = h.userUsecase.CreateMember(ctx, h.mapMemberBodyToDomain(requestBody.Member2))
 		if err != nil {
+			h.userUsecase.DeleteMemberByID(ctx, member1Id.UUID.String())
+			h.userUsecase.DeleteMemberByID(ctx, member2Id.UUID.String())
 			c.Error(err)
 			return
 		}
@@ -250,6 +304,8 @@ func (h HTTPUserDelivery) RegisterCompetition(c *gin.Context) {
 
 	id, err := h.userUsecase.RegisterCompetition(ctx, team)
 	if err != nil {
+		h.userUsecase.DeleteMemberByID(ctx, member1Id.UUID.String())
+		h.userUsecase.DeleteMemberByID(ctx, member2Id.UUID.String())
 		c.Error(err)
 		return
 	}

@@ -33,6 +33,7 @@ func (h HTTPUserDelivery) mapTeamBodyToDomain(leadId string, member1Id uuid.Null
 
 	team := domainTeam.Team{
 		ID:          uuid.New(),
+		TeamName:    t.TeamName,
 		IdLeader:    uuid.MustParse(leadId),
 		IdMember1:   member1Id,
 		IdMember2:   member2Id,

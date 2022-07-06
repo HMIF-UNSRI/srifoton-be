@@ -23,6 +23,9 @@ var _ user.Repository = &RepositoryMock{}
 //
 // 		// make and configure a mocked user.Repository
 // 		mockedRepository := &RepositoryMock{
+// 			DeleteMemberByIDFunc: func(ctx context.Context, id string) error {
+// 				panic("mock out the DeleteMemberByID method")
+// 			},
 // 			FindAllFunc: func(ctx context.Context) (userDomain.User, error) {
 // 				panic("mock out the FindAll method")
 // 			},
@@ -66,6 +69,9 @@ var _ user.Repository = &RepositoryMock{}
 //
 // 	}
 type RepositoryMock struct {
+	// DeleteMemberByIDFunc mocks the DeleteMemberByID method.
+	DeleteMemberByIDFunc func(ctx context.Context, id string) error
+
 	// FindAllFunc mocks the FindAll method.
 	FindAllFunc func(ctx context.Context) (userDomain.User, error)
 
@@ -104,6 +110,13 @@ type RepositoryMock struct {
 
 	// calls tracks calls to the methods.
 	calls struct {
+		// DeleteMemberByID holds details about calls to the DeleteMemberByID method.
+		DeleteMemberByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
 		// FindAll holds details about calls to the FindAll method.
 		FindAll []struct {
 			// Ctx is the ctx argument value.
@@ -189,6 +202,7 @@ type RepositoryMock struct {
 			ID string
 		}
 	}
+	lockDeleteMemberByID    sync.RWMutex
 	lockFindAll             sync.RWMutex
 	lockFindByEmail         sync.RWMutex
 	lockFindByID            sync.RWMutex
@@ -201,6 +215,41 @@ type RepositoryMock struct {
 	lockInsertUser          sync.RWMutex
 	lockUpdatePassword      sync.RWMutex
 	lockUpdateVerifiedEmail sync.RWMutex
+}
+
+// DeleteMemberByID calls DeleteMemberByIDFunc.
+func (mock *RepositoryMock) DeleteMemberByID(ctx context.Context, id string) error {
+	if mock.DeleteMemberByIDFunc == nil {
+		panic("RepositoryMock.DeleteMemberByIDFunc: method is nil but Repository.DeleteMemberByID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockDeleteMemberByID.Lock()
+	mock.calls.DeleteMemberByID = append(mock.calls.DeleteMemberByID, callInfo)
+	mock.lockDeleteMemberByID.Unlock()
+	return mock.DeleteMemberByIDFunc(ctx, id)
+}
+
+// DeleteMemberByIDCalls gets all the calls that were made to DeleteMemberByID.
+// Check the length with:
+//     len(mockedRepository.DeleteMemberByIDCalls())
+func (mock *RepositoryMock) DeleteMemberByIDCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockDeleteMemberByID.RLock()
+	calls = mock.calls.DeleteMemberByID
+	mock.lockDeleteMemberByID.RUnlock()
+	return calls
 }
 
 // FindAll calls FindAllFunc.
