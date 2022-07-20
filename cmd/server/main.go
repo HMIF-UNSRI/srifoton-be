@@ -15,6 +15,7 @@ import (
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user/postgres"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
@@ -28,6 +29,7 @@ func main() {
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
+	httpServer.Router.Use(cors.Default())
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = 8 << 8
 

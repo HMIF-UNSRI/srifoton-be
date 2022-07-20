@@ -48,9 +48,9 @@ func (repository postgresUserRepositoryImpl) FindByID(ctx context.Context, id st
 }
 
 func (repository postgresUserRepositoryImpl) FindTeamByID(ctx context.Context, id string) (team teamDomain.Team, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, team_name, id_lead, competition, id_member_1, id_member_2 FROM teams WHERE id_lead = $1 LIMIT 1;", id)
+	row := repository.db.QueryRowContext(ctx, "SELECT id, team_name, id_lead, competition, is_confirmed, id_member_1, id_member_2 FROM teams WHERE id_lead = $1 LIMIT 1;", id)
 
-	err = row.Scan(&team.ID, &team.TeamName, &team.IdLeader, &team.Competition, &team.IdMember1, &team.IdMember2)
+	err = row.Scan(&team.ID, &team.TeamName, &team.IdLeader, &team.Competition, &team.IsConfirmed, &team.IdMember1, &team.IdMember2)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("user not found")
 	}
@@ -108,6 +108,21 @@ func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Con
 		return id, errorCommon.NewNotFoundError("user not found")
 	}
 	return id, err
+}
+
+func (repository postgresUserRepositoryImpl) UpdateUser(ctx context.Context, updateUser userDomain.UpdateUser) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET nama = $1, nim = $2, university = $3, no_wa = $4 WHERE id = $5 RETURNING id;",
+		updateUser.Nama,
+		updateUser.Nim,
+		updateUser.University,
+		updateUser.NoWa,
+		updateUser.ID,
+	)
+	err = row.Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return rid, errorCommon.NewNotFoundError("user not found")
+	}
+	return rid, err
 }
 
 func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context, filename string) (id string, err error) {

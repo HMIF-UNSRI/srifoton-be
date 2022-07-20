@@ -59,6 +59,9 @@ var _ user.Repository = &RepositoryMock{}
 // 			UpdatePasswordFunc: func(ctx context.Context, id string, password string) (string, error) {
 // 				panic("mock out the UpdatePassword method")
 // 			},
+// 			UpdateUserFunc: func(ctx context.Context, updateUser userDomain.UpdateUser) (string, error) {
+// 				panic("mock out the UpdateUser method")
+// 			},
 // 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
 // 				panic("mock out the UpdateVerifiedEmail method")
 // 			},
@@ -104,6 +107,9 @@ type RepositoryMock struct {
 
 	// UpdatePasswordFunc mocks the UpdatePassword method.
 	UpdatePasswordFunc func(ctx context.Context, id string, password string) (string, error)
+
+	// UpdateUserFunc mocks the UpdateUser method.
+	UpdateUserFunc func(ctx context.Context, updateUser userDomain.UpdateUser) (string, error)
 
 	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
 	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
@@ -194,6 +200,13 @@ type RepositoryMock struct {
 			// Password is the password argument value.
 			Password string
 		}
+		// UpdateUser holds details about calls to the UpdateUser method.
+		UpdateUser []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// UpdateUser is the updateUser argument value.
+			UpdateUser userDomain.UpdateUser
+		}
 		// UpdateVerifiedEmail holds details about calls to the UpdateVerifiedEmail method.
 		UpdateVerifiedEmail []struct {
 			// Ctx is the ctx argument value.
@@ -214,6 +227,7 @@ type RepositoryMock struct {
 	lockInsertTeam          sync.RWMutex
 	lockInsertUser          sync.RWMutex
 	lockUpdatePassword      sync.RWMutex
+	lockUpdateUser          sync.RWMutex
 	lockUpdateVerifiedEmail sync.RWMutex
 }
 
@@ -634,6 +648,41 @@ func (mock *RepositoryMock) UpdatePasswordCalls() []struct {
 	mock.lockUpdatePassword.RLock()
 	calls = mock.calls.UpdatePassword
 	mock.lockUpdatePassword.RUnlock()
+	return calls
+}
+
+// UpdateUser calls UpdateUserFunc.
+func (mock *RepositoryMock) UpdateUser(ctx context.Context, updateUser userDomain.UpdateUser) (string, error) {
+	if mock.UpdateUserFunc == nil {
+		panic("RepositoryMock.UpdateUserFunc: method is nil but Repository.UpdateUser was just called")
+	}
+	callInfo := struct {
+		Ctx        context.Context
+		UpdateUser userDomain.UpdateUser
+	}{
+		Ctx:        ctx,
+		UpdateUser: updateUser,
+	}
+	mock.lockUpdateUser.Lock()
+	mock.calls.UpdateUser = append(mock.calls.UpdateUser, callInfo)
+	mock.lockUpdateUser.Unlock()
+	return mock.UpdateUserFunc(ctx, updateUser)
+}
+
+// UpdateUserCalls gets all the calls that were made to UpdateUser.
+// Check the length with:
+//     len(mockedRepository.UpdateUserCalls())
+func (mock *RepositoryMock) UpdateUserCalls() []struct {
+	Ctx        context.Context
+	UpdateUser userDomain.UpdateUser
+} {
+	var calls []struct {
+		Ctx        context.Context
+		UpdateUser userDomain.UpdateUser
+	}
+	mock.lockUpdateUser.RLock()
+	calls = mock.calls.UpdateUser
+	mock.lockUpdateUser.RUnlock()
 	return calls
 }
 

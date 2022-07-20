@@ -25,4 +25,5 @@ type Repository interface {
 	DeleteMemberByID(ctx context.Context, id string) (err error)
 	UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error)
 	UpdatePassword(ctx context.Context, id, password string) (rid string, err error)
+	UpdateUser(ctx context.Context, updateUser userDomain.UpdateUser) (rid string, err error)
 }

@@ -180,6 +180,36 @@ func (usecase userUsecaseImpl) ResetPassword(ctx context.Context, id, oldPasswor
 	return usecase.userRepository.UpdatePassword(ctx, id, hashPassword)
 }
 
+func (usecase userUsecaseImpl) UpdateUser(ctx context.Context, u userDomain.UpdateUser) (rid string, err error) {
+
+	user, err := usecase.userRepository.FindByID(ctx, u.ID.String())
+
+	if user.Nim != u.Nim {
+		userByNim, _ := usecase.userRepository.FindUserByNim(ctx, u.Nim)
+		if userByNim.Nama != "" {
+			return "", errorCommon.NewForbiddenError("Nim already exist")
+		}
+	}
+
+	if user.Nama == "" {
+		return "", err
+	}
+
+	team, _ := usecase.userRepository.FindTeamByID(ctx, u.ID.String())
+
+	if team.IsConfirmed {
+		return "", errorCommon.NewForbiddenError("Account already verified, Can't make any change")
+	}
+
+	rid, err = usecase.userRepository.UpdateUser(ctx, u)
+
+	if err != nil {
+		return "", errorCommon.NewInvariantError(err.Error())
+	}
+
+	return rid, err
+}
+
 func (usecase userUsecaseImpl) GetMailActivation(ctx context.Context, email string) (err error) {
 	user, err := usecase.userRepository.FindByEmail(ctx, email)
 	if err != nil {
@@ -260,6 +290,7 @@ func (usecase userUsecaseImpl) GetTeamById(ctx context.Context, id string) (memb
 	members = httpCommon.TeamResponse{
 		TeamName:    teamDB.TeamName,
 		Competition: teamDB.GetUCompetitionTypeString(),
+		IsVerified:  teamDB.IsConfirmed,
 		Members: []httpCommon.UserResponse{
 			member_1,
 			member_2,

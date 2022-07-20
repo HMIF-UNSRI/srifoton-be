@@ -22,6 +22,7 @@ type Usecase interface {
 	GetById(ctx context.Context, id string) (user httpCommon.UserResponse, err error)
 	GetTeamById(ctx context.Context, id string) (members httpCommon.TeamResponse, err error)
 	DeleteMemberByID(ctx context.Context, id string) (err error)
+	UpdateUser(ctx context.Context, u userDomain.UpdateUser) (rid string, err error)
 
 	// Usecase to handle uploaded file (KPM & Bukti Pembayaran)
 	UploadKPM(ctx context.Context, file *multipart.FileHeader) (id string, err error)

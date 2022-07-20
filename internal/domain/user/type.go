@@ -22,6 +22,14 @@ type (
 		Timestamp
 	}
 
+	UpdateUser struct {
+		ID         uuid.UUID
+		Nama       string
+		Nim        string
+		University string
+		NoWa       string
+	}
+
 	role      string
 	Timestamp = domain.Timestamp
 )

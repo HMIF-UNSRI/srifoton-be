@@ -33,6 +33,7 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 	router.GET("/activate/:token", handler.ActivateUserAccount)
 	router.POST("/reset-password", handler.ResetPassword)
 	router.POST("/competition", handler.RegisterCompetition)
+	router.PATCH("/update-data", handler.UpdateUser)
 	router.PATCH("/reset-password", handler.ResetPassword)
 
 	return handler
@@ -118,8 +119,40 @@ func (h HTTPUserDelivery) ResetPassword(c *gin.Context) {
 		},
 	})
 }
+func (h HTTPUserDelivery) UpdateUser(c *gin.Context) {
+	var requestBody httpCommon.UpdateUser
+	if err := c.BindJSON(&requestBody); err != nil {
+		return
+	}
+
+	inputUserID, ok := c.Get("user_id")
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+	userID, ok := inputUserID.(string)
+	if !ok {
+		c.Error(ErrorUserID)
+		return
+	}
+
+	updatedUser := h.mapUpdateDataBodyToDomain(requestBody, userID)
+
+	id, err := h.userUsecase.UpdateUser(c.Request.Context(), updatedUser)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": gin.H{
+			"id": id,
+		},
+	})
+}
 
 func (h HTTPUserDelivery) ActivateUserAccount(c *gin.Context) {
+
 	inputUserID, ok := c.Get("user_id")
 	if !ok {
 		c.Error(ErrorUserID)
@@ -132,17 +165,10 @@ func (h HTTPUserDelivery) ActivateUserAccount(c *gin.Context) {
 	}
 	ctx := c.Request.Context()
 
-	id, err := h.userUsecase.Activate(ctx, userID)
-	if err != nil {
-		c.Error(err)
-		return
-	}
+	h.userUsecase.Activate(ctx, userID)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": gin.H{
-			"id": id,
-		},
-	})
+	c.Redirect(http.StatusFound, "http://localhost:3000/login")
+
 }
 
 func (h HTTPUserDelivery) GetUserById(c *gin.Context) {

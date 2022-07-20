@@ -59,6 +59,13 @@ type (
 		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
 	}
 
+	UpdateUser struct {
+		Nama       string `json:"name" binding:"required"`
+		Nim        string `json:"nim" binding:"required"`
+		University string `json:"university" binding:"required"`
+		NoWa       string `json:"no_wa" binding:"required"`
+	}
+
 	UserResponse struct {
 		Name       string `json:"name"`
 		Nim        string `json:"nim"`
@@ -70,6 +77,7 @@ type (
 	TeamResponse struct {
 		TeamName    string         `json:"team_name"`
 		Competition string         `json:"competition_name"`
+		IsVerified  bool           `json:"is_verified"`
 		Members     []UserResponse `json:"members"`
 	}
 )

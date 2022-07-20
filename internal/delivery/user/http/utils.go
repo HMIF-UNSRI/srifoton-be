@@ -67,3 +67,15 @@ func (h HTTPUserDelivery) mapMemberBodyToDomain(m httpCommon.Member) domainMembe
 
 	return member
 }
+
+func (h HTTPUserDelivery) mapUpdateDataBodyToDomain(m httpCommon.UpdateUser, id string) domainUser.UpdateUser {
+	updatedUser := domainUser.UpdateUser{
+		ID:         uuid.MustParse(id),
+		Nama:       m.Nama,
+		Nim:        m.Nim,
+		University: m.University,
+		NoWa:       m.NoWa,
+	}
+
+	return updatedUser
+}

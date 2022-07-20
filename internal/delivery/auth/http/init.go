@@ -14,12 +14,12 @@ type HTTPAuthDelivery struct {
 
 func NewHTTPAuthDelivery(router *gin.RouterGroup, authUCase authUc.Usecase) HTTPAuthDelivery {
 	h := HTTPAuthDelivery{authUCase: authUCase}
-
 	router.POST("", h.login)
 	return h
 }
 
 func (h HTTPAuthDelivery) login(c *gin.Context) {
+
 	var request httpCommon.User
 	ctx := c.Request.Context()
 	if err := c.BindJSON(&request); err != nil {
