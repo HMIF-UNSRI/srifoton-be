@@ -48,14 +48,14 @@ client.test("Register User Validation Password Required", function() {
 ### Register Confirmation
 GET http://localhost:8000/api/users/activate
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxNDlkOWZkLWRjMzQtNDc1Mi1iMTlmLWM4NTc2NWM5YTNkOCIsImV4cCI6MTY1Nzg5NzMzNH0.qnxrtQODk3qJqsk-jmbhG7TNx_GiUmlWkt6kRRn0czg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFiMDZjYWZjLTk2ZWQtNGQyYy04ZTI0LTg0ODc4ZjczZWZiYSIsInBhc3N3b3JkIjoiIiwiZXhwIjoxNjU1NzkzOTY0fQ.3rM1jfX4vJDeEyeE2TDX3juiLc9SLOaxeSbaUyC7exE
 
 ### Login User Success
 POST http://localhost:8000/api/auth
 Content-Type: application/json
 
 {
-  "email": "aryahmph@gmail.com",
+  "email": "aryayun90@gmail.com",
   "password": "H4CK3D_BY_HM1F"
 }
 
@@ -81,3 +81,28 @@ client.test("Login User Wrong Password", function() {
   client.assert(response.body.message === "wrong credentials")
 });
 %}
+
+### Forgot Password
+POST http://localhost:8000/api/users/forgot-password
+Content-Type: application/json
+
+{
+  "email": "aryayun90@gmail.com"
+}
+
+### Forgot Password Not Found
+POST http://localhost:8000/api/users/forgot-password
+Content-Type: application/json
+
+{
+  "email": "aryayun90000000@gmail.com"
+}
+
+### Reset Password
+PATCH http://localhost:8000/api/users/reset-password
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjFiMDZjYWZjLTk2ZWQtNGQyYy04ZTI0LTg0ODc4ZjczZWZiYSIsInBhc3N3b3JkIjoiJDJhJDEwJG9SRlVtQmo3OHhXd0lFRzM3b2Y0TU96cHIvdzdUY3hjNUxmSTdsZjlUYnBMdzl5Qmsud25LIiwiZXhwIjoxNjUzMjg4NTc1fQ.r0Ny-guFAkgqFB7XZ8Y93JwwSbj2Rx-vT9_F9sQ-2R4
+
+{
+  "new_password": "AKU_CINTA_KAMU"
+}
