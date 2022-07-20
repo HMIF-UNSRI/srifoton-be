@@ -1,4 +1,4 @@
-package user
+package member
 
 import (
 	"github.com/HMIF-UNSRI/srifoton-be/internal/domain"
@@ -6,30 +6,17 @@ import (
 )
 
 type (
-	User struct {
+	Member struct {
 		ID         uuid.UUID
 		IdKpm      uuid.UUID
 		Nama       string
 		Nim        string
 		Email      string
-		Password   string
-		University string
 		NoWa       string
-		Role       role
-
-		IsEmailVerified bool
+		University string
 
 		Timestamp
 	}
 
-	UpdateUser struct {
-		ID         uuid.UUID
-		Nama       string
-		Nim        string
-		University string
-		NoWa       string
-	}
-
-	role      string
 	Timestamp = domain.Timestamp
 )

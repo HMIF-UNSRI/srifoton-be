@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Invoice {{.TeamName}}</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, intial-scale=1">
+    </head>
+    <body style="background-color: #f1f1f1;">
+        <div style="
+        padding: 50px 0px 0px;
+        margin: 0px;
+        min-width: 600px;
+        width: 100%;
+        font-family: arial,helvetica,sans-serif;
+        ">
+            <div style="
+            width: 600px;
+            margin: 0px auto 0px;
+            padding: 0px 0px 20px;
+            ">
+                <div style="
+                text-align: center;">
+                    <img src="../Logo.png" style="
+                    max-width:80px;
+                    ">
+                    <div style="
+                    font-size: 40px;
+                    color: #313131;
+                    line-height: 100px;
+                    ">
+                        Thank You
+                    </div>
+                </div>
+
+                <div style="
+                background-color: #ffffff;
+                padding-bottom:30px;
+                ">
+                    <br>
+                    <div style="
+                    padding: 0px 20px;
+                    line-height:14px;">
+                        <span style="
+                        font-size:18px;
+                        font-weight:bold;">
+                            Hi {{.TeamName}}
+                        </span>
+                        <br>
+                        <br>
+                        Thanks for joining SRIFOTON 2022
+                        <br>
+                    </div>
+                    <div style="
+                    text-align: center;
+                    line-height: 14px;">
+                        <span style="
+                        font-size:30px;
+                        line-height: 40px;">
+                        <br>
+                            <strong>
+                                INVOICE ID:
+                                <br>
+                                {{.ID}}
+                            </strong>
+                        </span>
+                        <br>
+                        <span style="
+                        font-size:14px;
+                        color: #b2b2b2;
+                        line-height: 40px;">
+                        ( Please keep a copy of this receipt for your records. )
+                        </span>
+                    </div>
+                    <br>
+                    <div style="
+                    padding: 0px 20px;
+                    font-size: 14px;
+                    color: #b2b2b2;
+                    text-align: left;
+                    ">
+                        <strong>
+                        INVOICE INFORMATION :
+                        </strong>
+                        <hr>
+                    </div>
+                    <table style="
+                    color: #313131;
+                    table-layout: fixed;
+                    width: 540px;
+                    margin: 0px auto 15px;">
+                        <tbody>
+                            <tr>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                width: 25%;">
+                                    <strong>
+                                        ID :
+                                    </strong>
+                                </td>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                width: 25%;">
+                                    <strong>
+                                        Team Name :
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                                vertical-align: top;
+                                width: 25%;">
+                                {{.ID}}
+                                </td>
+                                <td style="
+                                vertical-align: top;
+                                width: 25%;">
+                                {{.TeamName}}
+                                </td>
+                            </tr>
+
+
+
+                            <tr>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                width: 25%;">
+                                    <strong>
+                                       DATE :
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                                
+                                vertical-align: top;
+                                width: 25%;">
+                                {{.Date}}
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                width: 25%;">
+                                    <strong>
+                                       MEMBER :
+                                    </strong>
+                                </td>
+                            </tr>
+                            {{range .Members}}
+                            <tr>
+                                <td style="
+                                vertical-align: top;">
+                                    {{.}}
+                                </td>
+                            </tr>
+                            {{end}}
+                        </tbody>
+                    </table>
+                    <div style="
+                        padding: 10px 20px;
+                        font-size: 14px;
+                        color: #b2b2b2;
+                        text-align: left;
+                        ">
+                            <strong>
+                            INVOICE DETAILS:
+                            </strong>
+                            <hr>
+                    </div>
+                    <table style="
+                    color: #313131;
+                    width: 540px;
+                    margin: 0px auto 15px;">
+                        <tbody>
+                            <tr>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                background-color:#f2f2f2;
+                                text-align:left;">
+                                    <strong>
+                                        Competition Name :
+                                    </strong>
+                                </td>
+                                <td style="
+                                padding-top: 15px;
+                                vertical-align: top;
+                                background-color:#f2f2f2;
+                                text-align:right;">
+                                    <strong>
+                                        Price :
+                                    </strong>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                                vertical-align: top;
+                                text-align:left;">
+                                {{.Competition}}
+                                </td>
+                                <td style="
+                                vertical-align: top;
+                                text-align:right;">
+                                IDR. {{.Price}}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                                vertical-align: top;
+                                text-align:left;">
+                                <hr>
+                                </td>
+                                <td style="
+                                vertical-align: top;
+                                text-align:right;">
+                                <hr>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="
+                                vertical-align: top;
+                                text-align:left;">
+                                
+                                </td>
+                                <td style="
+                                vertical-align: top;
+                                text-align:right;">
+                                TOTAL : IDR. {{.Price}}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+        </div>
+    </body>
+</html>

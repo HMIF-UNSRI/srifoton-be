@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
@@ -13,12 +15,13 @@ import (
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user/postgres"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
-	"log"
+	"github.com/gin-contrib/cors"
 )
 
 func main() {
 	cfg := env.LoadConfig()
-	db := dbCommon.NewPostgres(cfg.PostgresURL)
+	fmt.Println(cfg)
+	db := dbCommon.NewPostgres(cfg.MigrationPath, cfg.PostgresURL)
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
@@ -26,7 +29,10 @@ func main() {
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
+	httpServer.Router.Use(cors.Default())
 	httpServer.Router.RedirectTrailingSlash = true
+	httpServer.Router.MaxMultipartMemory = 8 << 8
+
 	root := httpServer.Router.Group("/api")
 
 	userRepository := userRepo.NewPostgresUserRepositoryImpl(db)

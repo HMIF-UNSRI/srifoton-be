@@ -1,0 +1,14 @@
+include .env
+
+tidy:
+	go mod tidy
+
+migrate-up:
+	migrate -path ./config/db -database $(POSTGRES_CONNECTION_URL) -verbose up
+
+migrate-down:
+	migrate -path ./config/db -database $(POSTGRES_CONNECTION_URL) -verbose down
+
+migrate-fresh: migrate-down migrate-up
+
+.PHONY:	migrate-up migrate-down
