@@ -80,4 +80,12 @@ type (
 		IsVerified  bool           `json:"is_verified"`
 		Members     []UserResponse `json:"members"`
 	}
+
+	UserEmail struct {
+		Email string `json:"email" binding:"required,email"`
+	}
+
+	ResetPasswordUser struct {
+		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
+	}
 )

@@ -3,7 +3,6 @@ package auth
 import (
 	"context"
 	"time"
-
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
