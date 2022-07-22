@@ -76,7 +76,7 @@ type (
 
 	TeamResponse struct {
 		TeamName    string         `json:"team_name"`
-		Competition string         `json:"competition_name"`
+		Competition string         `json:"competition"`
 		IsVerified  bool           `json:"is_verified"`
 		Members     []UserResponse `json:"members"`
 	}

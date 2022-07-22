@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
@@ -10,9 +11,11 @@ import (
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passwordCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	dbCommon "github.com/HMIF-UNSRI/srifoton-be/common/postgres"
+	adminDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/admin/http"
 	authDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/auth/http"
 	userDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/user/http"
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user/postgres"
+	adminUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/admin"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-contrib/cors"
@@ -29,13 +32,23 @@ func main() {
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
-	httpServer.Router.Use(cors.Default())
+	httpServer.Router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: false,
+		AllowAllOrigins:  true,
+		MaxAge:           12 * time.Hour,
+	}))
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = 8 << 8
 
 	root := httpServer.Router.Group("/api")
 
 	userRepository := userRepo.NewPostgresUserRepositoryImpl(db)
+
+	adminUsecase := adminUc.NewAdminUsecaseImpl(userRepository, mailManager)
+	adminDelivery.NewHTTPAdminDelivery(root.Group("/admins"), adminUsecase)
+
 	userUsecase := userUc.NewUserUsecaseImpl(userRepository, passwordManager, jwtManager, mailManager)
 	userDelivery.NewHTTPUserDelivery(root.Group("/users"), userUsecase, jwtManager)
 

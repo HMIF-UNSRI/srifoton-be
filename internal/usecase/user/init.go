@@ -74,37 +74,12 @@ func (usecase userUsecaseImpl) DeleteMemberByID(ctx context.Context, id string) 
 }
 
 func (usecase userUsecaseImpl) RegisterCompetition(ctx context.Context, team teamDomain.Team) (id string, err error) {
-	var leader userDomain.User
-	var memberOne memberDomain.Member
-	var memberTwo memberDomain.Member
+
 	id, err = usecase.userRepository.InsertTeam(ctx, team)
 	if err != nil {
 		return "", errorCommon.NewInvariantError(err.Error())
 	}
-	leader, err = usecase.userRepository.FindByID(ctx, team.IdLeader.String())
 
-	if err != nil {
-		return "", errorCommon.NewInvariantError("user not found")
-	}
-
-	if team.IdMember1.Valid {
-		memberOne, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember1.UUID.String())
-		if err != nil {
-			return "", errorCommon.NewInvariantError("member one not found")
-		}
-	}
-
-	if team.IdMember2.Valid {
-		memberTwo, err = usecase.userRepository.FindMemberByID(ctx, team.IdMember2.UUID.String())
-		if err != nil {
-			return "", errorCommon.NewInvariantError("member two not found")
-		}
-	}
-
-	team, _ = usecase.userRepository.FindTeamByID(ctx, leader.ID.String())
-
-	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(team, leader.Nama, memberOne.Nama, memberTwo.Nama))
 	return id, nil
 }
 
@@ -169,7 +144,7 @@ func (usecase userUsecaseImpl) ResetPassword(ctx context.Context, id, oldPasswor
 
 	// Compare password between db and jwt
 	if user.Password != oldPassword {
-		return rid, errorCommon.NewForbiddenError("wrong password")
+		return rid, errorCommon.NewForbiddenError("Please Go to Forgot Password Page to create another reset password request")
 	}
 
 	hashPassword, err := usecase.passwordManager.HashPassword(newPassword)
@@ -195,7 +170,7 @@ func (usecase userUsecaseImpl) UpdateUser(ctx context.Context, u userDomain.Upda
 		return "", err
 	}
 
-	team, _ := usecase.userRepository.FindTeamByID(ctx, u.ID.String())
+	team, _ := usecase.userRepository.FindTeamByLeadID(ctx, u.ID.String())
 
 	if team.IsConfirmed {
 		return "", errorCommon.NewForbiddenError("Account already verified, Can't make any change")
@@ -262,7 +237,7 @@ func (usecase userUsecaseImpl) GetById(ctx context.Context, id string) (user htt
 }
 
 func (usecase userUsecaseImpl) GetTeamById(ctx context.Context, id string) (members httpCommon.TeamResponse, err error) {
-	teamDB, err := usecase.userRepository.FindTeamByID(ctx, id)
+	teamDB, err := usecase.userRepository.FindTeamByLeadID(ctx, id)
 	if err != nil {
 		return members, err
 	}

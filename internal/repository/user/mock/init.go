@@ -41,6 +41,9 @@ var _ user.Repository = &RepositoryMock{}
 // 			FindTeamByIDFunc: func(ctx context.Context, id string) (teamDomain.Team, error) {
 // 				panic("mock out the FindTeamByID method")
 // 			},
+// 			FindTeamByLeadIDFunc: func(ctx context.Context, id string) (teamDomain.Team, error) {
+// 				panic("mock out the FindTeamByLeadID method")
+// 			},
 // 			FindUserByNimFunc: func(ctx context.Context, nim string) (userDomain.User, error) {
 // 				panic("mock out the FindUserByNim method")
 // 			},
@@ -64,6 +67,9 @@ var _ user.Repository = &RepositoryMock{}
 // 			},
 // 			UpdateVerifiedEmailFunc: func(ctx context.Context, id string) (string, error) {
 // 				panic("mock out the UpdateVerifiedEmail method")
+// 			},
+// 			UpdateVerifiedTeamFunc: func(ctx context.Context, id string) (string, error) {
+// 				panic("mock out the UpdateVerifiedTeam method")
 // 			},
 // 		}
 //
@@ -90,6 +96,9 @@ type RepositoryMock struct {
 	// FindTeamByIDFunc mocks the FindTeamByID method.
 	FindTeamByIDFunc func(ctx context.Context, id string) (teamDomain.Team, error)
 
+	// FindTeamByLeadIDFunc mocks the FindTeamByLeadID method.
+	FindTeamByLeadIDFunc func(ctx context.Context, id string) (teamDomain.Team, error)
+
 	// FindUserByNimFunc mocks the FindUserByNim method.
 	FindUserByNimFunc func(ctx context.Context, nim string) (userDomain.User, error)
 
@@ -113,6 +122,9 @@ type RepositoryMock struct {
 
 	// UpdateVerifiedEmailFunc mocks the UpdateVerifiedEmail method.
 	UpdateVerifiedEmailFunc func(ctx context.Context, id string) (string, error)
+
+	// UpdateVerifiedTeamFunc mocks the UpdateVerifiedTeam method.
+	UpdateVerifiedTeamFunc func(ctx context.Context, id string) (string, error)
 
 	// calls tracks calls to the methods.
 	calls struct {
@@ -151,6 +163,13 @@ type RepositoryMock struct {
 		}
 		// FindTeamByID holds details about calls to the FindTeamByID method.
 		FindTeamByID []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
+		// FindTeamByLeadID holds details about calls to the FindTeamByLeadID method.
+		FindTeamByLeadID []struct {
 			// Ctx is the ctx argument value.
 			Ctx context.Context
 			// ID is the id argument value.
@@ -214,6 +233,13 @@ type RepositoryMock struct {
 			// ID is the id argument value.
 			ID string
 		}
+		// UpdateVerifiedTeam holds details about calls to the UpdateVerifiedTeam method.
+		UpdateVerifiedTeam []struct {
+			// Ctx is the ctx argument value.
+			Ctx context.Context
+			// ID is the id argument value.
+			ID string
+		}
 	}
 	lockDeleteMemberByID    sync.RWMutex
 	lockFindAll             sync.RWMutex
@@ -221,6 +247,7 @@ type RepositoryMock struct {
 	lockFindByID            sync.RWMutex
 	lockFindMemberByID      sync.RWMutex
 	lockFindTeamByID        sync.RWMutex
+	lockFindTeamByLeadID    sync.RWMutex
 	lockFindUserByNim       sync.RWMutex
 	lockInsertFile          sync.RWMutex
 	lockInsertMember        sync.RWMutex
@@ -229,6 +256,7 @@ type RepositoryMock struct {
 	lockUpdatePassword      sync.RWMutex
 	lockUpdateUser          sync.RWMutex
 	lockUpdateVerifiedEmail sync.RWMutex
+	lockUpdateVerifiedTeam  sync.RWMutex
 }
 
 // DeleteMemberByID calls DeleteMemberByIDFunc.
@@ -434,6 +462,41 @@ func (mock *RepositoryMock) FindTeamByIDCalls() []struct {
 	mock.lockFindTeamByID.RLock()
 	calls = mock.calls.FindTeamByID
 	mock.lockFindTeamByID.RUnlock()
+	return calls
+}
+
+// FindTeamByLeadID calls FindTeamByLeadIDFunc.
+func (mock *RepositoryMock) FindTeamByLeadID(ctx context.Context, id string) (teamDomain.Team, error) {
+	if mock.FindTeamByLeadIDFunc == nil {
+		panic("RepositoryMock.FindTeamByLeadIDFunc: method is nil but Repository.FindTeamByLeadID was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockFindTeamByLeadID.Lock()
+	mock.calls.FindTeamByLeadID = append(mock.calls.FindTeamByLeadID, callInfo)
+	mock.lockFindTeamByLeadID.Unlock()
+	return mock.FindTeamByLeadIDFunc(ctx, id)
+}
+
+// FindTeamByLeadIDCalls gets all the calls that were made to FindTeamByLeadID.
+// Check the length with:
+//     len(mockedRepository.FindTeamByLeadIDCalls())
+func (mock *RepositoryMock) FindTeamByLeadIDCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockFindTeamByLeadID.RLock()
+	calls = mock.calls.FindTeamByLeadID
+	mock.lockFindTeamByLeadID.RUnlock()
 	return calls
 }
 
@@ -718,5 +781,40 @@ func (mock *RepositoryMock) UpdateVerifiedEmailCalls() []struct {
 	mock.lockUpdateVerifiedEmail.RLock()
 	calls = mock.calls.UpdateVerifiedEmail
 	mock.lockUpdateVerifiedEmail.RUnlock()
+	return calls
+}
+
+// UpdateVerifiedTeam calls UpdateVerifiedTeamFunc.
+func (mock *RepositoryMock) UpdateVerifiedTeam(ctx context.Context, id string) (string, error) {
+	if mock.UpdateVerifiedTeamFunc == nil {
+		panic("RepositoryMock.UpdateVerifiedTeamFunc: method is nil but Repository.UpdateVerifiedTeam was just called")
+	}
+	callInfo := struct {
+		Ctx context.Context
+		ID  string
+	}{
+		Ctx: ctx,
+		ID:  id,
+	}
+	mock.lockUpdateVerifiedTeam.Lock()
+	mock.calls.UpdateVerifiedTeam = append(mock.calls.UpdateVerifiedTeam, callInfo)
+	mock.lockUpdateVerifiedTeam.Unlock()
+	return mock.UpdateVerifiedTeamFunc(ctx, id)
+}
+
+// UpdateVerifiedTeamCalls gets all the calls that were made to UpdateVerifiedTeam.
+// Check the length with:
+//     len(mockedRepository.UpdateVerifiedTeamCalls())
+func (mock *RepositoryMock) UpdateVerifiedTeamCalls() []struct {
+	Ctx context.Context
+	ID  string
+} {
+	var calls []struct {
+		Ctx context.Context
+		ID  string
+	}
+	mock.lockUpdateVerifiedTeam.RLock()
+	calls = mock.calls.UpdateVerifiedTeam
+	mock.lockUpdateVerifiedTeam.RUnlock()
 	return calls
 }

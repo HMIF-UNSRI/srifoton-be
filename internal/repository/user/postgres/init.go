@@ -47,7 +47,7 @@ func (repository postgresUserRepositoryImpl) FindByID(ctx context.Context, id st
 	return user, err
 }
 
-func (repository postgresUserRepositoryImpl) FindTeamByID(ctx context.Context, id string) (team teamDomain.Team, err error) {
+func (repository postgresUserRepositoryImpl) FindTeamByLeadID(ctx context.Context, id string) (team teamDomain.Team, err error) {
 	row := repository.db.QueryRowContext(ctx, "SELECT id, team_name, id_lead, competition, is_confirmed, id_member_1, id_member_2 FROM teams WHERE id_lead = $1 LIMIT 1;", id)
 
 	err = row.Scan(&team.ID, &team.TeamName, &team.IdLeader, &team.Competition, &team.IsConfirmed, &team.IdMember1, &team.IdMember2)
@@ -55,6 +55,26 @@ func (repository postgresUserRepositoryImpl) FindTeamByID(ctx context.Context, i
 		return team, errorCommon.NewNotFoundError("user not found")
 	}
 	return team, err
+}
+
+func (repository postgresUserRepositoryImpl) FindTeamByID(ctx context.Context, id string) (team teamDomain.Team, err error) {
+	row := repository.db.QueryRowContext(ctx, "SELECT id, team_name, id_lead, competition, is_confirmed, id_member_1, id_member_2 FROM teams WHERE id = $1 LIMIT 1;", id)
+
+	err = row.Scan(&team.ID, &team.TeamName, &team.IdLeader, &team.Competition, &team.IsConfirmed, &team.IdMember1, &team.IdMember2)
+	if errors.Is(err, sql.ErrNoRows) {
+		return team, errorCommon.NewNotFoundError("user not found")
+	}
+	return team, err
+}
+
+func (repository postgresUserRepositoryImpl) UpdateVerifiedTeam(ctx context.Context, id string) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE teams SET is_confirmed = true WHERE id = $1 RETURNING id;", id)
+
+	err = row.Scan(&rid)
+	if errors.Is(err, sql.ErrNoRows) {
+		return rid, errorCommon.NewNotFoundError("user not found")
+	}
+	return rid, err
 }
 
 func (repository postgresUserRepositoryImpl) FindMemberByID(ctx context.Context, id string) (member memberDomain.Member, err error) {
