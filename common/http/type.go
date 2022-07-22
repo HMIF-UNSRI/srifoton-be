@@ -51,10 +51,6 @@ type (
 		// UpdatedAt time.Time `json:"updated_at"`
 	}
 
-	UserEmail struct {
-		Email string `json:"email" binding:"required"`
-	}
-
 	ResetPassword struct {
 		NewPassword string `json:"new_password" binding:"required,gte=8,lte=16"`
 	}
