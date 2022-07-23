@@ -1,15 +1,16 @@
 package http
 
 import (
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	uploadUsecase "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/upload"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
-	"os"
-	"path/filepath"
 )
 
 var (
@@ -31,12 +32,12 @@ type HTTPUploadDelivery struct {
 func NewHTTPUploadDelivery(router *gin.RouterGroup, uploadUsecase uploadUsecase.Usecase, jwtManager *jwtCommon.JWTManager) HTTPUploadDelivery {
 	handler := HTTPUploadDelivery{uploadUsecase: uploadUsecase}
 
-	router.POST("/kpm/:filename", handler.uploadKPM)
+	router.POST("/kpm", handler.uploadKPM)
 
 	router.Use(httpCommon.MiddlewareJWT(jwtManager))
 	//router.GET("/kpm/:filename", handler.getKPM)
 	//router.GET("/payments/:filename", handler.getPaymentSign)
-	router.POST("/payments/:filename", handler.uploadPaymentSign)
+	router.POST("/payments", handler.uploadPaymentSign)
 	return handler
 }
 

@@ -103,7 +103,3 @@ func ParseInvoiceTemplate(data InvoiceService) string {
 
 	return buff.String()
 }
-
-func TextResetPassword(token string) string {
-	return fmt.Sprintf(ResetPasswordEmailBody, token)
-}

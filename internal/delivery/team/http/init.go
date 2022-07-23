@@ -1,11 +1,13 @@
 package http
 
 import (
+	"fmt"
+	"net/http"
+
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	teamUsecase "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/team"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type HTTPTeamDelivery struct {
@@ -41,7 +43,9 @@ func (h HTTPTeamDelivery) register(c *gin.Context) {
 
 	ctx := c.Request.Context()
 	member1 := h.mapMemberBodyToDomain(requestBody.Member1)
+	fmt.Println("Ini Member 1 : " + member1.Name)
 	member2 := h.mapMemberBodyToDomain(requestBody.Member2)
+	fmt.Println("Ini Member 2 : " + member2.Name)
 
 	id, err := h.teamUsecase.Register(ctx, h.mapTeamBodyToDomain(member1, member2, requestBody))
 	if err != nil {

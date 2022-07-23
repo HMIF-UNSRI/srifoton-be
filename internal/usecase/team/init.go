@@ -3,6 +3,8 @@ package team
 import (
 	"context"
 	"database/sql"
+	"fmt"
+
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
@@ -30,15 +32,24 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 	// Enable transactional mode
 	tx, err := usecase.db.Begin()
 	if err != nil {
+		fmt.Println(err)
 		return id, err
 	}
-
+	fmt.Println("Begin TX")
 	// Save member
 	var member1ID, member2ID string
 	if team.Member1 != (memberDomain.Member{}) {
+		kpm, err := usecase.uploadRepository.FindByID(ctx, team.Member1.KPM.ID)
+		if err != nil {
+			if txErr := tx.Rollback(); txErr != nil {
+				return id, txErr
+			}
+			return id, err
+		}
+		team.Member1.KPM = kpm
 		member1ID, err = usecase.memberRepository.Insert(tx, ctx, team.Member1)
 		if err != nil {
-			if txErr := tx.Rollback(); err != nil {
+			if txErr := tx.Rollback(); txErr != nil {
 				return id, txErr
 			}
 			return id, err
@@ -50,10 +61,20 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 		}
 	}
 
+	fmt.Println("Insert Member 1")
+
 	if team.Member2 != (memberDomain.Member{}) {
+		kpm, err := usecase.uploadRepository.FindByID(ctx, team.Member2.KPM.ID)
+		if err != nil {
+			if txErr := tx.Rollback(); txErr != nil {
+				return id, txErr
+			}
+			return id, err
+		}
+		team.Member2.KPM = kpm
 		member2ID, err = usecase.memberRepository.Insert(tx, ctx, team.Member2)
 		if err != nil {
-			if txErr := tx.Rollback(); err != nil {
+			if txErr := tx.Rollback(); txErr != nil {
 				return id, txErr
 			}
 			return id, err
@@ -63,24 +84,45 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 			Valid:  true,
 		}
 	}
-
+	fmt.Println("Insert Member 2")
 	// Save team
-	id, err = usecase.teamRepository.Insert(tx, ctx, team)
+	payment, err := usecase.uploadRepository.FindByID(ctx, team.Payment.ID)
 	if err != nil {
-		if txErr := tx.Rollback(); err != nil {
+		if txErr := tx.Rollback(); txErr != nil {
 			return id, txErr
 		}
 		return id, err
 	}
+
+	team.Payment = payment
+	team.Leader, err = usecase.userRepository.FindByID(ctx, team.Leader.ID)
+	if err != nil {
+		if txErr := tx.Rollback(); txErr != nil {
+			return id, txErr
+		}
+		return id, err
+	}
+
+	id, err = usecase.teamRepository.Insert(tx, ctx, team)
+	if err != nil {
+		if txErr := tx.Rollback(); txErr != nil {
+			return id, txErr
+		}
+		return id, err
+	}
+	team.ID = id
+	fmt.Println("Insert Team")
 
 	// Commit or Rollback
 	err = tx.Commit()
 	if err != nil {
-		if txErr := tx.Rollback(); err != nil {
+		if txErr := tx.Rollback(); txErr != nil {
 			return id, txErr
 		}
 		return id, err
 	}
+
+	fmt.Println("Commit")
 
 	go usecase.mailManager.SendMail([]string{team.Leader.Email}, []string{}, "Invoice",
 		mailCommon.TextInvoice(team, team.Leader.Name, team.Member1.Name, team.Member2.Name))
