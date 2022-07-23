@@ -12,11 +12,11 @@ services:
       - POSTGRES_DB=srifoton
     volumes:
       - postgresDB:/var/lib/postgresql/data
-#  backend:
-#    build:
-#      context: .
-#    container_name: "backend"
-#    depends_on:
-#      - postgres
+  backend:
+    build:
+      context: .
+    container_name: "backend"
+    depends_on:
+      - postgres
 volumes:
   postgresDB:
