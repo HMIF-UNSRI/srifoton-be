@@ -2,8 +2,9 @@ package user
 
 import (
 	"context"
-	uploadRepository "github.com/HMIF-UNSRI/srifoton-be/internal/repository/upload"
 	"time"
+
+	uploadRepository "github.com/HMIF-UNSRI/srifoton-be/internal/repository/upload"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
@@ -85,7 +86,7 @@ func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string)
 		return id, errorCommon.NewNotFoundError("user not found")
 	}
 
-	token, err := usecase.jwtManager.GenerateToken(user.ID, user.PasswordHash, time.Hour*24)
+	token, err := usecase.jwtManager.GenerateToken(user.ID, user.PasswordHash, user.Name, time.Hour*24)
 	if err != nil {
 		return id, err
 	}
@@ -185,7 +186,7 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 	if user.IsEmailVerified {
 		return errorCommon.NewInvariantError("email already verified")
 	}
-	token, err := usecase.jwtManager.GenerateToken(user.ID, "", time.Hour*24*30)
+	token, err := usecase.jwtManager.GenerateToken(user.ID, "", user.Name, time.Hour*24*30)
 	if err != nil {
 		return err
 	}

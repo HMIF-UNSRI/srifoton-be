@@ -15,10 +15,11 @@ func NewJWTManager(accessTokenKey string) *JWTManager {
 	return &JWTManager{AccessTokenKey: []byte(accessTokenKey)}
 }
 
-func (j JWTManager) GenerateToken(id, password string, duration time.Duration) (string, error) {
+func (j JWTManager) GenerateToken(id, password, name string, duration time.Duration) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 		id,
 		password,
+		name,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(duration).Unix(),
 		},

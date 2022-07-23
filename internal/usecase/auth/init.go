@@ -2,11 +2,12 @@ package auth
 
 import (
 	"context"
+	"time"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user"
-	"time"
 )
 
 type authUsecase struct {
@@ -33,5 +34,5 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 		return accessToken, err
 	}
 
-	return a.jwtManager.GenerateToken(user.ID, "", time.Hour*8)
+	return a.jwtManager.GenerateToken(user.ID, "", user.Name, time.Hour*8)
 }
