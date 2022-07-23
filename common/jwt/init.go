@@ -1,10 +1,10 @@
 package jwt
 
 import (
+	"github.com/golang-jwt/jwt/v4"
 	"time"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
-	"github.com/golang-jwt/jwt"
 )
 
 type JWTManager struct {
@@ -16,11 +16,14 @@ func NewJWTManager(accessTokenKey string) *JWTManager {
 }
 
 func (j JWTManager) GenerateToken(id, password string, duration time.Duration) (string, error) {
+	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, CustomClaims{
 		id,
 		password,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(duration).Unix(),
+		jwt.RegisteredClaims{
+			Issuer:    "HMIF UNSRI",
+			IssuedAt:  jwt.NewNumericDate(now),
+			ExpiresAt: jwt.NewNumericDate(now.Add(duration)),
 		},
 	})
 
