@@ -45,12 +45,12 @@ func TextInvoice(team teamDomain.Team, leader, memberOne, memberTwo string) stri
 		id += "B" + strconv.Itoa((rand.Intn(40-31) + 31))
 		price = "50000"
 	}
-	id += string(team.ID.String()[0]) + strconv.Itoa((rand.Intn(9)))
+	id += string(team.ID[0]) + strconv.Itoa((rand.Intn(9)))
 	id = strings.ToUpper(id)
 
 	service := InvoiceService{
 		ID:          id,
-		TeamName:    team.TeamName,
+		TeamName:    team.Name,
 		Competition: team.GetUCompetitionTypeString(),
 		Members:     []string{leader, memberOne, memberTwo},
 		Price:       price,

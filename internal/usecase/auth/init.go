@@ -29,7 +29,7 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 		return accessToken, errorCommon.NewNotFoundError("email not verified")
 	}
 
-	if err := a.passwordManager.CheckPasswordHash(password, user.Password); err != nil {
+	if err := a.passwordManager.CheckPasswordHash(password, user.PasswordHash); err != nil {
 		return accessToken, err
 	}
 
