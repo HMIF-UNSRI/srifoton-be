@@ -38,6 +38,9 @@ func main() {
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = uploadDelivery.MaxFileSize
 
+	uploadStatic := httpServer.Router.Group("/", httpCommon.MiddlewareJWT(jwtManager))
+	uploadStatic.Static("/uploads", "./uploads")
+
 	root := httpServer.Router.Group("/api")
 
 	uploadRepository := uploadRepo.NewPostgresUploadRepositoryImpl(db)
