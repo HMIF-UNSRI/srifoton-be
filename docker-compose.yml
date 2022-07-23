@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  postgres:
+    image: postgres:14.4-alpine
+    container_name: "postgres"
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=srifoton
+    volumes:
+      - postgresDB:/var/lib/postgresql/data
+#  backend:
+#    build:
+#      context: .
+#    container_name: "backend"
+#    depends_on:
+#      - postgres
+volumes:
+  postgresDB:

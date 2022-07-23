@@ -6,10 +6,7 @@ import (
 	"errors"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
-	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
-	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
-	"github.com/google/uuid"
 )
 
 type postgresUserRepositoryImpl struct {
@@ -20,15 +17,10 @@ func NewPostgresUserRepositoryImpl(db *sql.DB) postgresUserRepositoryImpl {
 	return postgresUserRepositoryImpl{db: db}
 }
 
-func (repository postgresUserRepositoryImpl) InsertUser(ctx context.Context, user userDomain.User) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO users(id_kpm, nama, nim, email, password, university,no_wa) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;",
-		user.IdKpm,
-		user.Nama,
-		user.Nim,
-		user.Email,
-		user.Password,
-		user.University,
-		user.NoWa,
+func (repository postgresUserRepositoryImpl) Insert(ctx context.Context, user userDomain.User) (id string, err error) {
+	row := repository.db.QueryRowContext(ctx,
+		"INSERT INTO users(kpm_filename, name, nim, email, password_hash, university, whatsapp_number) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id;",
+		user.KPM.Filename, user.Name, user.Nim, user.Email, user.PasswordHash, user.University, user.WhatsappNumber,
 	)
 	err = row.Scan(&id)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -38,85 +30,38 @@ func (repository postgresUserRepositoryImpl) InsertUser(ctx context.Context, use
 }
 
 func (repository postgresUserRepositoryImpl) FindByID(ctx context.Context, id string) (user userDomain.User, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, nama, nim, email, password, no_wa, university, role, is_email_verified FROM users WHERE id = $1 LIMIT 1;", id)
+	row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, created_at, updated_at FROM users WHERE id = $1 LIMIT 1;", id)
 
-	err = row.Scan(&user.ID, &user.Nama, &user.Nim, &user.Email, &user.Password, &user.NoWa, &user.University, &user.Role, &user.IsEmailVerified)
+	err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.CreatedAt, &user.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return user, errorCommon.NewNotFoundError("user not found")
 	}
 	return user, err
-}
-
-func (repository postgresUserRepositoryImpl) FindTeamByID(ctx context.Context, id string) (team teamDomain.Team, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, team_name, id_lead, competition, is_confirmed, id_member_1, id_member_2 FROM teams WHERE id_lead = $1 LIMIT 1;", id)
-
-	err = row.Scan(&team.ID, &team.TeamName, &team.IdLeader, &team.Competition, &team.IsConfirmed, &team.IdMember1, &team.IdMember2)
-	if errors.Is(err, sql.ErrNoRows) {
-		return team, errorCommon.NewNotFoundError("user not found")
-	}
-	return team, err
-}
-
-func (repository postgresUserRepositoryImpl) FindMemberByID(ctx context.Context, id string) (member memberDomain.Member, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, nama, nim, email, university, no_wa FROM members WHERE id = $1 LIMIT 1;", id)
-
-	err = row.Scan(&member.ID, &member.Nama, &member.Nim, &member.Email, &member.University, &member.NoWa)
-	if errors.Is(err, sql.ErrNoRows) {
-		return member, errorCommon.NewNotFoundError("user not found")
-	}
-	return member, err
-}
-
-func (repository postgresUserRepositoryImpl) DeleteMemberByID(ctx context.Context, id string) (err error) {
-	row := repository.db.QueryRowContext(ctx, "DELETE FROM members WHERE id = $1;", id)
-
-	if row.Err() != nil {
-		return errorCommon.NewNotFoundError(row.Err().Error())
-	}
-	return err
 }
 
 func (repository postgresUserRepositoryImpl) FindByEmail(ctx context.Context, email string) (user userDomain.User, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, nama, email, password, role, is_email_verified FROM users WHERE email = $1 LIMIT 1;", email)
+	row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, created_at, updated_at FROM users WHERE email = $1 LIMIT 1;", email)
 
-	err = row.Scan(&user.ID, &user.Nama, &user.Email, &user.Password, &user.Role, &user.IsEmailVerified)
+	err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.CreatedAt, &user.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return user, errorCommon.NewNotFoundError("user not found")
 	}
 	return user, err
 }
 
-func (repository postgresUserRepositoryImpl) FindUserByNim(ctx context.Context, nim string) (user userDomain.User, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, nama, email, password, role, is_email_verified FROM users WHERE nim = $1 LIMIT 1;", nim)
+func (repository postgresUserRepositoryImpl) FindByNim(ctx context.Context, nim string) (user userDomain.User, err error) {
+	row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, created_at, updated_at FROM users WHERE nim = $1 LIMIT 1;", nim)
 
-	err = row.Scan(&user.ID, &user.Nama, &user.Email, &user.Password, &user.Role, &user.IsEmailVerified)
+	err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.CreatedAt, &user.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return user, errorCommon.NewNotFoundError("user not found")
 	}
 	return user, err
 }
 
-func (repository postgresUserRepositoryImpl) FindAll(ctx context.Context) (users userDomain.User, err error) {
-	//TODO: implement me
-	panic("implement me")
-}
-
-func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error) {
-	row := repository.db.QueryRowContext(ctx, "UPDATE users SET is_email_verified = true WHERE id = $1 RETURNING id;", id)
-	err = row.Scan(&rid)
-	if errors.Is(err, sql.ErrNoRows) {
-		return id, errorCommon.NewNotFoundError("user not found")
-	}
-	return id, err
-}
-
-func (repository postgresUserRepositoryImpl) UpdateUser(ctx context.Context, updateUser userDomain.UpdateUser) (rid string, err error) {
-	row := repository.db.QueryRowContext(ctx, "UPDATE users SET nama = $1, nim = $2, university = $3, no_wa = $4 WHERE id = $5 RETURNING id;",
-		updateUser.Nama,
-		updateUser.Nim,
-		updateUser.University,
-		updateUser.NoWa,
-		updateUser.ID,
+func (repository postgresUserRepositoryImpl) Update(ctx context.Context, user userDomain.User) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET name = $1, nim = $2, university = $3, whatsapp_number = $4, updated_at = now() WHERE id = $5 RETURNING id;",
+		user.Name, user.Nim, user.University, user.WhatsappNumber, user.ID,
 	)
 	err = row.Scan(&rid)
 	if errors.Is(err, sql.ErrNoRows) {
@@ -125,58 +70,17 @@ func (repository postgresUserRepositoryImpl) UpdateUser(ctx context.Context, upd
 	return rid, err
 }
 
-func (repository postgresUserRepositoryImpl) InsertFile(ctx context.Context, filename string) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO uploads(file_name) VALUES ($1) RETURNING id;",
-		filename,
-	)
-
-	err = row.Scan(&id)
+func (repository postgresUserRepositoryImpl) UpdateVerifiedEmail(ctx context.Context, id string) (rid string, err error) {
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET is_email_verified = true, updated_at = now() WHERE id = $1 RETURNING id;", id)
+	err = row.Scan(&rid)
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("user not found")
 	}
 	return id, err
 }
 
-func (repository postgresUserRepositoryImpl) InsertTeam(ctx context.Context, team teamDomain.Team) (id string, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO teams(team_name ,id_lead, competition, id_member_1, id_member_2, id_payment) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		team.TeamName,
-		team.IdLeader,
-		team.Competition,
-		team.IdMember1,
-		team.IdMember2,
-		team.IdPayment,
-	)
-
-	err = row.Scan(&id)
-	if errors.Is(err, sql.ErrNoRows) {
-		return id, errorCommon.NewNotFoundError("team not found")
-	}
-
-	if err != nil {
-		return id, errorCommon.NewNotFoundError(err.Error())
-	}
-	return id, err
-}
-
-func (repository postgresUserRepositoryImpl) InsertMember(ctx context.Context, member memberDomain.Member) (id uuid.NullUUID, err error) {
-	row := repository.db.QueryRowContext(ctx, "INSERT INTO members(id_kpm, nama, nim, email, university, no_wa) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-		member.IdKpm,
-		member.Nama,
-		member.Nim,
-		member.Email,
-		member.University,
-		member.NoWa,
-	)
-
-	err = row.Scan(&id)
-	if errors.Is(err, sql.ErrNoRows) {
-		return id, errorCommon.NewNotFoundError("member not found")
-	}
-	return id, err
-}
-
 func (repository postgresUserRepositoryImpl) UpdatePassword(ctx context.Context, id, password string) (rid string, err error) {
-	row := repository.db.QueryRowContext(ctx, "UPDATE users SET password = $1 WHERE id = $2 RETURNING id;", password, id)
+	row := repository.db.QueryRowContext(ctx, "UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2 RETURNING id;", password, id)
 	err = row.Scan(&rid)
 	if errors.Is(err, sql.ErrNoRows) {
 		return id, errorCommon.NewNotFoundError("user not found")

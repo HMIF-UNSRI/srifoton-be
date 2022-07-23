@@ -2,34 +2,26 @@ package user
 
 import (
 	"github.com/HMIF-UNSRI/srifoton-be/internal/domain"
-	"github.com/google/uuid"
+	uploadDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/upload"
 )
 
 type (
 	User struct {
-		ID         uuid.UUID
-		IdKpm      uuid.UUID
-		Nama       string
-		Nim        string
-		Email      string
-		Password   string
-		University string
-		NoWa       string
-		Role       role
-
+		ID              string
+		Name            string
+		Nim             string
+		Email           string
+		PasswordHash    string
+		University      string
+		WhatsappNumber  string
 		IsEmailVerified bool
+		Role            role
+		KPM             Upload
 
 		Timestamp
 	}
 
-	UpdateUser struct {
-		ID         uuid.UUID
-		Nama       string
-		Nim        string
-		University string
-		NoWa       string
-	}
-
 	role      string
+	Upload    = uploadDomain.Upload
 	Timestamp = domain.Timestamp
 )
