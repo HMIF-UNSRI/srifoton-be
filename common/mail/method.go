@@ -33,19 +33,19 @@ func TextInvoice(team teamDomain.Team, leader, memberOne, memberTwo string) stri
 	fmt.Println(string(team.Competition))
 	switch string(team.Competition) {
 	case "CP":
-		id += "A" + strconv.Itoa((rand.Intn(10-0) + 0))
+		id += "A" + strconv.Itoa(rand.Intn(10-0)+0)
 		price = "100000"
 	case "UI/UX":
-		id += "B" + strconv.Itoa((rand.Intn(20-11) + 11))
+		id += "B" + strconv.Itoa(rand.Intn(20-11)+11)
 		price = "80000"
 	case "WEB":
-		id += "C" + strconv.Itoa((rand.Intn(30-21) + 21))
+		id += "C" + strconv.Itoa(rand.Intn(30-21)+21)
 		price = "60000"
 	case "ESPORT":
-		id += "B" + strconv.Itoa((rand.Intn(40-31) + 31))
+		id += "B" + strconv.Itoa(rand.Intn(40-31)+31)
 		price = "50000"
 	}
-	id += string(team.ID[0]) + strconv.Itoa((rand.Intn(9)))
+	id += string(team.ID[0]) + strconv.Itoa(rand.Intn(9))
 	id = strings.ToUpper(id)
 
 	service := InvoiceService{
