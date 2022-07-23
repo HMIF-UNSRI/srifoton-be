@@ -9,7 +9,7 @@ type uploadUsecaseImpl struct {
 	uploadRepository uploadRepository.Repository
 }
 
-func NewTeamUsecaseImpl(uploadRepository uploadRepository.Repository) uploadUsecaseImpl {
+func NewUploadUsecaseImpl(uploadRepository uploadRepository.Repository) uploadUsecaseImpl {
 	return uploadUsecaseImpl{uploadRepository: uploadRepository}
 }
 

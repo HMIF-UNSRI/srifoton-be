@@ -47,12 +47,6 @@ func (h HTTPUploadDelivery) uploadKPM(c *gin.Context) {
 		return
 	}
 
-	ext := filepath.Ext(file.Filename)
-	if ext != ".png" && ext != ".jpg" && ext != ".jpeg" {
-		c.Error(errorCommon.NewInvariantError("only png, jpeg, jpg or pdf extension is supported"))
-		return
-	}
-
 	filename, err := h.saveFile(c, file, "kpm")
 	if err != nil {
 		c.Error(err)
