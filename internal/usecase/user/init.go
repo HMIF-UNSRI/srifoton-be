@@ -177,6 +177,15 @@ func (usecase userUsecaseImpl) GetById(ctx context.Context, id string) (user htt
 	return user, err
 }
 
+func (usecase userUsecaseImpl) IsAdmin(ctx context.Context, id string) (isAdmin bool, err error) {
+	userByID, err := usecase.userRepository.FindByID(ctx, id)
+	if err != nil {
+		return isAdmin, err
+	}
+
+	return userByID.Role == userDomain.Admin, nil
+}
+
 func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email string) (err error) {
 	user, err := usecase.userRepository.FindByEmail(ctx, email)
 	if err != nil {

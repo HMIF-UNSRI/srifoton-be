@@ -38,9 +38,6 @@ func main() {
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = uploadDelivery.MaxFileSize
 
-	uploadStatic := httpServer.Router.Group("/", httpCommon.MiddlewareJWT(jwtManager))
-	uploadStatic.Static("/uploads", "./uploads")
-
 	root := httpServer.Router.Group("/api")
 
 	uploadRepository := uploadRepo.NewPostgresUploadRepositoryImpl(db)
@@ -59,6 +56,10 @@ func main() {
 	teamRepository := teamRepo.NewPostgresTeamRepositoryImpl(db)
 	teamUsecase := teamUc.NewTeamUsecaseImpl(db, teamRepository, memberRepository, userRepository, uploadRepository, mailManager)
 	teamDelivery.NewHTTPTeamDelivery(root.Group("/teams"), teamUsecase, jwtManager)
+
+	uploadStatic := httpServer.Router.Group("/",
+		httpCommon.MiddlewareJWT(jwtManager), httpCommon.MiddlewareAdminOnly(userUsecase))
+	uploadStatic.Static("/uploads", "./uploads")
 
 	log.Fatalln(httpServer.Router.Run(fmt.Sprintf(":%d", cfg.Port)))
 }
