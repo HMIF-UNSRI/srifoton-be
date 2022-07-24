@@ -91,9 +91,13 @@ func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string)
 		return id, err
 	}
 
+	templateStr, err := mailCommon.TextResetPassword(token)
+	if err != nil {
+		return id, err
+	}
+
 	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password",
-		mailCommon.TextResetPassword(token))
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password", templateStr)
 
 	return user.ID, err
 }
@@ -200,8 +204,11 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		return err
 	}
 
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation",
-		mailCommon.TextRegisterCompletion(user.Name, token))
+	templateStr, err := mailCommon.TextRegisterCompletion(user.Name, token)
+	if err != nil {
+		return err
+	}
 
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation", templateStr)
 	return err
 }

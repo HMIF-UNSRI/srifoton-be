@@ -115,8 +115,12 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 		return id, err
 	}
 
-	go usecase.mailManager.SendMail([]string{team.Leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(team, team.Leader.Name, team.Member1.Name, team.Member2.Name))
+	templateStr, err := mailCommon.TextInvoice(team, team.Leader.Name, team.Member1.Name, team.Member2.Name)
+	if err != nil {
+		return "", err
+	}
+
+	go usecase.mailManager.SendMail([]string{team.Leader.Email}, []string{}, "Invoice", templateStr)
 
 	return id, err
 }
