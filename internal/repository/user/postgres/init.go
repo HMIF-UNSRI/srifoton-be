@@ -30,9 +30,12 @@ func (repository postgresUserRepositoryImpl) Insert(ctx context.Context, user us
 }
 
 func (repository postgresUserRepositoryImpl) FindByID(ctx context.Context, id string) (user userDomain.User, err error) {
-	row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, created_at, updated_at FROM users WHERE id = $1 LIMIT 1;", id)
+	row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, kpm_filename, created_at, updated_at FROM users WHERE id = $1 LIMIT 1;", id)
+	err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.KPM.Filename, &user.CreatedAt, &user.UpdatedAt)
 
-	err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.CreatedAt, &user.UpdatedAt)
+	// row := repository.db.QueryRowContext(ctx, "SELECT id, name, nim, email, password_hash, university, role, is_email_verified, whatsapp_number, created_at, updated_at FROM users WHERE id = $1 LIMIT 1;", id)
+	// err = row.Scan(&user.ID, &user.Name, &user.Nim, &user.Email, &user.PasswordHash, &user.University, &user.Role, &user.IsEmailVerified, &user.WhatsappNumber, &user.CreatedAt, &user.UpdatedAt)
+
 	if errors.Is(err, sql.ErrNoRows) {
 		return user, errorCommon.NewNotFoundError("user not found")
 	}

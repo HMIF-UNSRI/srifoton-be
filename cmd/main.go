@@ -11,6 +11,7 @@ import (
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passwordCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
 	dbCommon "github.com/HMIF-UNSRI/srifoton-be/common/postgres"
+	adminDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/admin/http"
 	authDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/auth/http"
 	teamDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/team/http"
 	uploadDelivery "github.com/HMIF-UNSRI/srifoton-be/internal/delivery/upload/http"
@@ -19,6 +20,7 @@ import (
 	teamRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/team/postgres"
 	uploadRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/upload/postgres"
 	userRepo "github.com/HMIF-UNSRI/srifoton-be/internal/repository/user/postgres"
+	adminUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/admin"
 	authUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/auth"
 	teamUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/team"
 	uploadUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/upload"
@@ -58,6 +60,9 @@ func main() {
 	teamRepository := teamRepo.NewPostgresTeamRepositoryImpl(db)
 	teamUsecase := teamUc.NewTeamUsecaseImpl(db, teamRepository, memberRepository, userRepository, uploadRepository, mailManager)
 	teamDelivery.NewHTTPTeamDelivery(root.Group("/teams"), teamUsecase, jwtManager)
+
+	adminUsecase := adminUc.NewAdminUsecaseImpl(userRepository, mailManager)
+	adminDelivery.NewHTTPAdminDelivery(root.Group("/admins"), adminUsecase, userUsecase, teamUsecase, jwtManager)
 
 	uploadStatic := httpServer.Router.Group("/",
 		httpCommon.MiddlewareJWT(jwtManager), admin.MiddlewareAdminOnly(userUsecase))

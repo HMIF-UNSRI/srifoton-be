@@ -1,8 +1,6 @@
 package http
 
 import (
-	"fmt"
-
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	"github.com/gin-gonic/gin"
@@ -28,7 +26,7 @@ func MiddlewareJWT(j *jwt.JWTManager) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		fmt.Println(id)
+
 		c.Set("user_id", id)
 		c.Set("user_password", password)
 		c.Set("name", name)
