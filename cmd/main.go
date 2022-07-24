@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
+
+	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
@@ -21,7 +24,6 @@ import (
 	uploadUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/upload"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-contrib/cors"
-	"log"
 )
 
 func main() {
@@ -58,7 +60,7 @@ func main() {
 	teamDelivery.NewHTTPTeamDelivery(root.Group("/teams"), teamUsecase, jwtManager)
 
 	uploadStatic := httpServer.Router.Group("/",
-		httpCommon.MiddlewareJWT(jwtManager), httpCommon.MiddlewareAdminOnly(userUsecase))
+		httpCommon.MiddlewareJWT(jwtManager), admin.MiddlewareAdminOnly(userUsecase))
 	uploadStatic.Static("/uploads", "./uploads")
 
 	log.Fatalln(httpServer.Router.Run(fmt.Sprintf(":%d", cfg.Port)))
