@@ -375,8 +375,9 @@ func (usecase teamUsecaseImpl) GetByLeaderID(ctx context.Context, leaderID strin
 	}
 
 	team = httpCommon.Team{
-		ID:   teamByLeaderID.ID,
-		Name: teamByLeaderID.Name,
+		ID:         teamByLeaderID.ID,
+		Name:       teamByLeaderID.Name,
+		IsVerified: teamByLeaderID.IsConfirmed,
 		Leader: httpCommon.User{
 			ID:             leader.ID,
 			Name:           leader.Name,

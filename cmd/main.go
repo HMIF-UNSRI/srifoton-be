@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"time"
 
 	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
@@ -38,7 +39,13 @@ func main() {
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
 	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
-	httpServer.Router.Use(cors.Default())
+	httpServer.Router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
+		AllowCredentials: false,
+		AllowAllOrigins:  true,
+		MaxAge:           12 * time.Hour,
+	}))
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = uploadDelivery.MaxFileSize
 

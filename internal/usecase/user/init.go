@@ -152,7 +152,7 @@ func (usecase userUsecaseImpl) GetById(ctx context.Context, id string) (user htt
 		return user, err
 	}
 
-	kpm, err := usecase.uploadRepository.FindByID(ctx, userByID.KPM.ID)
+	kpm, err := usecase.uploadRepository.FindByFilename(ctx, userByID.KPM.Filename)
 	if err != nil {
 		return user, err
 	}

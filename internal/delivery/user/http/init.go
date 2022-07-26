@@ -1,12 +1,13 @@
 package http
 
 import (
+	"net/http"
+
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
 	userUsecase "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-gonic/gin"
-	"net/http"
 )
 
 type HTTPUserDelivery struct {

@@ -84,8 +84,8 @@ func (repository postgresTeamRepositoryImpl) FindByLeaderID(ctx context.Context,
 	row := repository.db.QueryRowContext(ctx,
 		"SELECT id, name, id_lead, competition, id_member1, id_member2, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id_lead = $1 LIMIT 1;", id)
 
-	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1,
-		&team.Member2, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
+		&team.Member2.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("team not found")
 	}
