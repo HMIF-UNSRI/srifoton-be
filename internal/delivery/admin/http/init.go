@@ -99,18 +99,23 @@ func (h HTTPAdminDelivery) GetByTeamName(c *gin.Context) {
 }
 
 func (h HTTPAdminDelivery) Invoice(c *gin.Context) {
-	// teamId := c.Param("id")
-	// err := h.adminUsecase.SendInvoice(c.Request.Context(), teamId)
-	// h.teamRepository.UpdateVerifiedTeam(c.Request.Context(), teamId)
+	teamId := c.Param("id")
 
-	// if err != nil {
-	// 	c.Error(err)
-	// 	return
-	// }
+	_, err := h.teamUsecase.ConfirmTeam(c.Request.Context(), teamId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
-	// c.JSON(http.StatusAccepted, gin.H{
-	// 	"data": gin.H{
-	// 		"status": "Approved",
-	// 	},
-	// })
+	err = h.adminUsecase.SendInvoice(c.Request.Context(), teamId)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusAccepted, gin.H{
+		"data": gin.H{
+			"status": "Approved",
+		},
+	})
 }

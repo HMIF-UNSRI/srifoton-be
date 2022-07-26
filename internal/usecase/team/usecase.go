@@ -14,4 +14,5 @@ type Usecase interface {
 	GetByTeamName(ctx context.Context, id string) (team httpCommon.Team, err error)
 	GetAll(ctx context.Context) (team []httpCommon.Team, err error)
 	GetUnverifiedTeam(ctx context.Context) (team []httpCommon.Team, err error)
+	ConfirmTeam(ctx context.Context, id string) (rid string, err error)
 }

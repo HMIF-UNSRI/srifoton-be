@@ -47,6 +47,10 @@ func (repository postgresTeamRepositoryImpl) FindAll(ctx context.Context) (team 
 	rows, err := repository.db.QueryContext(ctx,
 		"SELECT id, name, id_lead, competition, id_member1, id_member2, is_confirmed, payment_filename, created_at, updated_at FROM teams;")
 
+	if err != nil {
+		return team, err
+	}
+
 	for rows.Next() {
 		var teamRow teamDomain.Team
 
@@ -65,6 +69,10 @@ func (repository postgresTeamRepositoryImpl) FindAll(ctx context.Context) (team 
 func (repository postgresTeamRepositoryImpl) FindUnverifiedTeam(ctx context.Context) (team []teamDomain.Team, err error) {
 	rows, err := repository.db.QueryContext(ctx,
 		"SELECT id, name, id_lead, competition, id_member1, id_member2, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE is_confirmed = $1;", false)
+
+	if err != nil {
+		return team, err
+	}
 
 	for rows.Next() {
 		var teamRow teamDomain.Team
