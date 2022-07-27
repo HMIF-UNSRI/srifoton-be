@@ -59,18 +59,19 @@ func NewInvoiceManager() *InvoiceManager {
 	return &InvoiceManager{Config: config}
 }
 
-func (i InvoiceManager) CreateInvoice(team teamDomain.Team) error {
+func (i InvoiceManager) CreateInvoice(team teamDomain.Team) (err error, filePath string, fileName string) {
 	invoiceDetails := CreateInvoiceDetails(team)
 	img, err := i.writeTextOnImage(invoiceDetails, i.Config)
 	if err != nil {
-		return err
+		return err, filePath, fileName
 	}
-
-	err = gg.SaveJPG(fmt.Sprintf("./out/%s_%s.jpg", team.Name, "Invoice"), img, 100)
+	fileName = fmt.Sprintf("%s_%s.jpg", team.Name, "Invoice")
+	filePath = fmt.Sprintf("./out/%s", fileName)
+	err = gg.SaveJPG(filePath, img, 100)
 	if err != nil {
-		return err
+		return err, filePath, fileName
 	}
-	return nil
+	return err, filePath, fileName
 }
 
 func (i InvoiceManager) writeTextOnImage(details InvoiceDetails, config Config) (image.Image, error) {

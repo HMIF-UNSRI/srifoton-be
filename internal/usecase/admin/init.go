@@ -62,13 +62,13 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 		team.Member2 = memberTwo
 	}
 
-	err = usecase.invoiceManager.CreateInvoice(team)
+	err, filePath, fileName := usecase.invoiceManager.CreateInvoice(team)
 	if err != nil {
 		return err
 	}
 
-	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(team, leader.Name, memberOne.Name, memberTwo.Name))
+	go usecase.mailManager.SendMailWithAttachment([]string{leader.Email}, []string{}, "Invoice",
+		mailCommon.TextInvoice(team, leader.Name, memberOne.Name, memberTwo.Name), filePath, fileName)
 
 	return nil
 }
