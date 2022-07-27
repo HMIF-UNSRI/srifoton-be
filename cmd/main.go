@@ -8,6 +8,7 @@ import (
 	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
+	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	passwordCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
@@ -35,6 +36,7 @@ func main() {
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
+	invoiceManager := invoiceCommon.NewInvoiceManager()
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
@@ -68,7 +70,7 @@ func main() {
 	teamUsecase := teamUc.NewTeamUsecaseImpl(db, teamRepository, memberRepository, userRepository, uploadRepository, mailManager)
 	teamDelivery.NewHTTPTeamDelivery(root.Group("/teams"), teamUsecase, jwtManager)
 
-	adminUsecase := adminUc.NewAdminUsecaseImpl(userRepository, mailManager)
+	adminUsecase := adminUc.NewAdminUsecaseImpl(userRepository, teamRepository, memberRepository, mailManager, invoiceManager)
 	adminDelivery.NewHTTPAdminDelivery(root.Group("/admins"), adminUsecase, userUsecase, teamUsecase, jwtManager)
 
 	uploadStatic := httpServer.Router.Group("/",

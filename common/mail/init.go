@@ -1,8 +1,12 @@
 package mail
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"net/smtp"
 	"strings"
 )
@@ -51,12 +55,46 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
-	bodyMessage := "To: " + strings.Join(to, ",") + "\n" +
-		"Cc: " + strings.Join(cc, ",") + "\n" +
-		"Subject: " + subject + "\n" + "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n" + message
+
+	fileBytes, err := ioutil.ReadFile("./out/" + "BebekKeseleo_Invoice.jpg")
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	fileMIMEType := http.DetectContentType(fileBytes)
+
+	fileData := base64.StdEncoding.EncodeToString(fileBytes)
+
+	boundary := RandStr(32, "alphanum")
+
+	// bodyMessage := "To: " + strings.Join(to, ",") + "\n" +
+	// 	"Cc: " + strings.Join(cc, ",") + "\n" +
+	// 	"Subject: " + subject + "\n" +
+	// 	"MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n" +
+	// 	message
+
+	messageBody := []byte("Content-Type: multipart/mixed; boundary=" + boundary + " \n" +
+		"MIME-Version: 1.0\n" +
+		"to: " + strings.Join(to, ",") + "\n" +
+		"subject: " + subject + "\n\n" +
+
+		"--" + boundary + "\n" +
+		"Content-Type: text/plain; charset=" + string('"') + "UTF-8" + string('"') + "\n" +
+		"MIME-Version: 1.0\n" +
+		"Content-Transfer-Encoding: 7bit\n\n" +
+		"ini content" + "\n\n" +
+		"--" + boundary + "\n" +
+
+		"Content-Type: " + fileMIMEType + "; name=" + string('"') + "BebekKeseleo_Invoice.jpg" + string('"') + " \n" +
+		"MIME-Version: 1.0\n" +
+		"Content-Transfer-Encoding: base64\n" +
+		"Content-Disposition: attachment; filename=" + string('"') + "BebekKeseleo_Invoice.jpg" + string('"') + " \n\n" +
+		ChunkSplit(fileData, 76, "\n") +
+		"--" + boundary + "--")
+
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
 
-	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), []byte(bodyMessage))
+	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), messageBody)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

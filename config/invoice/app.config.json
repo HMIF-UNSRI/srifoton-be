@@ -1,0 +1,69 @@
+{
+  "config": {
+    "event_name": "Web Development Series",
+    "background_img": "./assets/bg-invoice.jpg",
+    "date": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 170,
+      "position_y": 230,
+      "color_rgb": "0,0,0"
+    },
+    "team_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 170,
+      "position_y": 278,
+      "color_rgb": "0,0,0"
+    },
+    "leader_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 170,
+      "position_y": 307,
+      "color_rgb": "0,0,0"
+    },
+    "member1_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 170,
+      "position_y": 336,
+      "color_rgb": "0,0,0"
+    },
+    "member2_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 170,
+      "position_y": 365,
+      "color_rgb": "0,0,0"
+    },
+    "competition_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 65,
+      "position_y": 475,
+      "color_rgb": "0,0,0"
+    },
+    "competition_price": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 337,
+      "position_y": 475,
+      "color_rgb": "0,0,0"
+    },
+    "competition_total_price": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 435,
+      "position_y": 475,
+      "color_rgb": "0,0,0"
+    },
+    "total_payment": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 17,
+      "position_x": 435,
+      "position_y": 561,
+      "color_rgb": "0,0,0"
+    }
+  }
+}

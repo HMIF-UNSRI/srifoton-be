@@ -4,6 +4,7 @@ import (
 	"context"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
+	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
 	userDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/user"
@@ -17,10 +18,16 @@ type adminUsecaseImpl struct {
 	teamRepository   teamRepository.Repository
 	memberRepository memberRepository.Repository
 	mailManager      *mailCommon.MailManager
+	invoiceManager   *invoiceCommon.InvoiceManager
 }
 
-func NewAdminUsecaseImpl(userRepository userRepository.Repository, mailManager *mailCommon.MailManager) adminUsecaseImpl {
-	return adminUsecaseImpl{userRepository: userRepository, mailManager: mailManager}
+func NewAdminUsecaseImpl(userRepository userRepository.Repository, teamRepository teamRepository.Repository, memberRepository memberRepository.Repository, mailManager *mailCommon.MailManager, invoiceManager *invoiceCommon.InvoiceManager) adminUsecaseImpl {
+	return adminUsecaseImpl{
+		userRepository:   userRepository,
+		teamRepository:   teamRepository,
+		memberRepository: memberRepository,
+		mailManager:      mailManager,
+		invoiceManager:   invoiceManager}
 }
 
 func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err error) {
@@ -30,9 +37,10 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 
 	team, err := usecase.teamRepository.FindByID(ctx, id)
 	if err != nil {
-		return errorCommon.NewInvariantError("team not found")
+		return errorCommon.NewInvariantError(err.Error())
 	}
 	leader, err = usecase.userRepository.FindByID(ctx, team.Leader.ID)
+	team.Leader = leader
 
 	if err != nil {
 		return errorCommon.NewInvariantError("user not found")
@@ -43,6 +51,7 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 		if err != nil {
 			return errorCommon.NewInvariantError("member one not found")
 		}
+		team.Member1 = memberOne
 	}
 
 	if team.Member2.ID.Valid {
@@ -50,9 +59,13 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 		if err != nil {
 			return errorCommon.NewInvariantError("member two not found")
 		}
+		team.Member2 = memberTwo
 	}
 
-	usecase.teamRepository.UpdateVerifiedTeam(ctx, id)
+	err = usecase.invoiceManager.CreateInvoice(team)
+	if err != nil {
+		return err
+	}
 
 	go usecase.mailManager.SendMail([]string{leader.Email}, []string{}, "Invoice",
 		mailCommon.TextInvoice(team, leader.Name, memberOne.Name, memberTwo.Name))
