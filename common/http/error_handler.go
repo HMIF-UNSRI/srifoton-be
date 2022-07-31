@@ -5,6 +5,7 @@ import (
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
+	"log"
 	"net/http"
 )
 
@@ -45,6 +46,7 @@ func MiddlewareErrorHandler() gin.HandlerFunc {
 						Message: err.Message,
 					})
 				} else {
+					log.Println("Internal error has occurred, see details:", err)
 					c.JSON(http.StatusInternalServerError, Error{
 						Code:    http.StatusInternalServerError,
 						Message: "Internal server error",

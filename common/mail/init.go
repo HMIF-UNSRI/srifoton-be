@@ -1,8 +1,12 @@
 package mail
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
 	"net/smtp"
 	"strings"
 )
@@ -51,12 +55,65 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
+
 	bodyMessage := "To: " + strings.Join(to, ",") + "\n" +
 		"Cc: " + strings.Join(cc, ",") + "\n" +
-		"Subject: " + subject + "\n" + "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n" + message
+		"Subject: " + subject + "\n" +
+		"MIME-version: 1.0;\n" +
+		"Content-Type: text/html; charset=\"UTF-8\";\n\n" +
+		message
+
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
 
 	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), []byte(bodyMessage))
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	return err
+}
+
+func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject string, message string, filePath string, fileName string) (err error) {
+	// Set up authentication information.
+	// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
+	auth := LoginAuth(m.Email, m.Password)
+
+	// Connect to the server, authenticate, set the sender and recipient,
+	// and send the email all in one step.
+
+	fileBytes, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	fileMIMEType := http.DetectContentType(fileBytes)
+
+	fileData := base64.StdEncoding.EncodeToString(fileBytes)
+
+	boundary := RandStr(32, "alphanum")
+
+	bodyMessage := []byte("Content-Type: multipart/mixed; boundary=" + boundary + " \n" +
+		"MIME-Version: 1.0\n" +
+		"to: " + strings.Join(to, ",") + "\n" +
+		"subject: " + subject + "\n\n" +
+
+		"--" + boundary + "\n" +
+		"Content-Type: text/plain; charset=" + string('"') + "UTF-8" + string('"') + "\n" +
+		"MIME-Version: 1.0\n" +
+		"Content-Transfer-Encoding: 7bit\n\n" +
+		message + "\n\n" +
+		"--" + boundary + "\n" +
+
+		"Content-Type: " + fileMIMEType + "; name=" + string('"') + fileName + string('"') + " \n" +
+		"MIME-Version: 1.0\n" +
+		"Content-Transfer-Encoding: base64\n" +
+		"Content-Disposition: attachment; filename=" + string('"') + fileName + string('"') + " \n\n" +
+		ChunkSplit(fileData, 76, "\n") +
+		"--" + boundary + "--")
+
+	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
+
+	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), bodyMessage)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

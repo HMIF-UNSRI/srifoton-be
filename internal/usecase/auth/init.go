@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"time"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	passCommon "github.com/HMIF-UNSRI/srifoton-be/common/password"
@@ -26,12 +27,12 @@ func (a authUsecase) Login(ctx context.Context, email string, password string) (
 	}
 
 	if !user.IsEmailVerified {
-		return accessToken, errorCommon.NewNotFoundError("please verified your email")
+		return accessToken, errorCommon.NewNotFoundError("email not verified")
 	}
 
-	if err := a.passwordManager.CheckPasswordHash(password, user.Password); err != nil {
+	if err := a.passwordManager.CheckPasswordHash(password, user.PasswordHash); err != nil {
 		return accessToken, err
 	}
 
-	return a.jwtManager.GenerateToken(user.ID.String(), "", time.Hour*8)
+	return a.jwtManager.GenerateToken(user.ID, "", user.Name, time.Hour*8)
 }

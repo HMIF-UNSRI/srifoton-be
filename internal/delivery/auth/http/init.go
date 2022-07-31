@@ -19,8 +19,7 @@ func NewHTTPAuthDelivery(router *gin.RouterGroup, authUCase authUc.Usecase) HTTP
 }
 
 func (h HTTPAuthDelivery) login(c *gin.Context) {
-
-	var request httpCommon.User
+	var request httpCommon.Login
 	ctx := c.Request.Context()
 	if err := c.BindJSON(&request); err != nil {
 		return

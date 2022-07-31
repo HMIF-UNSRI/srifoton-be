@@ -2,108 +2,145 @@ package mail
 
 import (
 	"bytes"
+	"embed"
 	"fmt"
 	"html/template"
 	"math/rand"
-	"strconv"
-	"strings"
-	"time"
 
 	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 )
 
-func TextRegisterCompletion(nama, token string) string {
+//go:embed templates/*.gohtml
+var templates embed.FS
+
+var parsedTemplates = template.Must(template.ParseFS(templates, "templates/*.gohtml"))
+
+func TextRegisterCompletion(nama, token string) (string, error) {
 	service := RegisterService{
 		Name:  nama,
 		Token: token,
 	}
-	return ParseActivationTemplate(service)
+	return ParseRegisterTemplate(service)
 }
 
-func TextResetPassword(token string) string {
+func TextResetPassword(token string) (string, error) {
 	service := ForgotPasswordService{
 		Token: token,
 	}
 	return ParseForgotPasswordTemplate(service)
 }
 
-func TextInvoice(team teamDomain.Team, leader, memberOne, memberTwo string) string {
-	var price string
-	id := ""
-	fmt.Println(string(team.Competition))
-	switch string(team.Competition) {
-	case "CP":
-		id += "A" + strconv.Itoa((rand.Intn(10-0) + 0))
-		price = "100000"
-	case "UI/UX":
-		id += "B" + strconv.Itoa((rand.Intn(20-11) + 11))
-		price = "80000"
-	case "WEB":
-		id += "C" + strconv.Itoa((rand.Intn(30-21) + 21))
-		price = "60000"
-	case "ESPORT":
-		id += "B" + strconv.Itoa((rand.Intn(40-31) + 31))
-		price = "50000"
-	}
-	id += string(team.ID.String()[0]) + strconv.Itoa((rand.Intn(9)))
-	id = strings.ToUpper(id)
+func TextInvoice(team teamDomain.Team) string {
+	// var sb strings.Builder
 
-	service := InvoiceService{
-		ID:          id,
-		TeamName:    team.TeamName,
-		Competition: team.GetUCompetitionTypeString(),
-		Members:     []string{leader, memberOne, memberTwo},
-		Price:       price,
-		Date:        time.Now().Format("2006 January 02 15:04:05"),
-	}
-	return ParseInvoiceTemplate(service)
+	// var price string
+	// switch string(team.Competition) {
+	// case "CP":
+	// 	sb.WriteString("A")
+	// 	sb.WriteString(strconv.Itoa(rand.Intn(10-0) + 0))
+	// 	price = "100000"
+	// case "UI/UX":
+	// 	sb.WriteString("B")
+	// 	sb.WriteString(strconv.Itoa(rand.Intn(20-11) + 11))
+	// 	price = "80000"
+	// case "WEB":
+	// 	sb.WriteString("C")
+	// 	sb.WriteString(strconv.Itoa(rand.Intn(30-21) + 21))
+	// 	price = "60000"
+	// case "ESPORT":
+	// 	sb.WriteString("D")
+	// 	sb.WriteString(strconv.Itoa(rand.Intn(40-31) + 31))
+	// 	price = "50000"
+	// default:
+	// 	return "", errors.New("unknown team competition type")
+	// }
+
+	// sb.WriteString(string(team.ID[0]))
+	// sb.WriteString(strconv.Itoa(rand.Intn(9)))
+	// id := strings.ToUpper(sb.String())
+
+	// service := InvoiceService{
+	// 	ID:          id,
+	// 	TeamName:    team.Name,
+	// 	Competition: team.GetUCompetitionTypeString(),
+	// 	Members:     []string{leader, memberOne, memberTwo},
+	// 	Price:       price,
+	// 	Date:        time.Now().Format("2006 January 02 15:04:05"),
+	// }
+	competition := team.GetUCompetitionTypeString()
+	message := fmt.Sprintf(InvoiceEmailBody, team.Name, competition)
+	return message
 }
 
-func ParseActivationTemplate(data RegisterService) string {
-	parseFiles, err := template.ParseFiles("common/mail/template/activation.gohtml")
-	if err != nil {
-		panic(err)
-	}
-
+func ParseRegisterTemplate(data RegisterService) (string, error) {
 	buff := new(bytes.Buffer)
-	err = parseFiles.Execute(buff, data)
+	err := parsedTemplates.ExecuteTemplate(buff, "activation.gohtml", data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return buff.String()
+	return buff.String(), nil
 }
 
-func ParseForgotPasswordTemplate(data ForgotPasswordService) string {
-	parseFiles, err := template.ParseFiles("common/mail/template/forgotpass.gohtml")
-	if err != nil {
-		panic(err)
-	}
-
+func ParseForgotPasswordTemplate(data ForgotPasswordService) (string, error) {
 	buff := new(bytes.Buffer)
-	err = parseFiles.Execute(buff, data)
+	err := parsedTemplates.ExecuteTemplate(buff, "forgotpass.gohtml", data)
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
-	return buff.String()
+	return buff.String(), nil
 }
 
-func ParseInvoiceTemplate(data InvoiceService) string {
-	parseFiles, err := template.ParseFiles("common/mail/template/invoice.gohtml")
-	if err != nil {
-		panic(err)
+// func ParseInvoiceTemplate(data InvoiceService) (string, error) {
+// 	buff := new(bytes.Buffer)
+// 	err := parsedTemplates.ExecuteTemplate(buff, "invoice.gohtml", data)
+// 	if err != nil {
+// 		return "", err
+// 	}
+
+// 	return buff.String(), nil
+// }
+
+func RandStr(strSize int, randType string) string {
+
+	var dictionary string
+
+	if randType == "alphanum" {
+		dictionary = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	}
 
-	buff := new(bytes.Buffer)
-	err = parseFiles.Execute(buff, data)
-	if err != nil {
-		panic(err)
+	var strBytes = make([]byte, strSize)
+	_, _ = rand.Read(strBytes)
+	for k, v := range strBytes {
+		strBytes[k] = dictionary[v%byte(len(dictionary))]
 	}
-
-	return buff.String()
+	return string(strBytes)
 }
 
-func TextResetPassword(token string) string {
-	return fmt.Sprintf(ResetPasswordEmailBody, token)
+func ChunkSplit(body string, limit int, end string) string {
+	var charSlice []rune
+
+	// push characters to slice
+	for _, char := range body {
+		charSlice = append(charSlice, char)
+	}
+
+	var result = ""
+
+	for len(charSlice) >= 1 {
+		// convert slice/array back to string
+		// but insert end at specified limit
+		result = result + string(charSlice[:limit]) + end
+
+		// discard the elements that were copied over to result
+		charSlice = charSlice[limit:]
+
+		// change the limit
+		// to cater for the last few words in
+		if len(charSlice) < limit {
+			limit = len(charSlice)
+		}
+	}
+	return result
 }

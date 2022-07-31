@@ -26,12 +26,13 @@ func init() {
 		})
 	}
 
-	logFile, err := os.OpenFile("application.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, err := os.OpenFile(LOGFILE, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	gin.DisableConsoleColor()
+	gin.EnableJsonDecoderDisallowUnknownFields()
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
 }
 
