@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"fmt"
 
 	teamDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/team"
 
@@ -132,7 +131,6 @@ func (repository postgresTeamRepositoryImpl) FindByID(ctx context.Context, id st
 	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
 		&team.Member2.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
-		fmt.Println("repo")
 		return team, errorCommon.NewNotFoundError("team not found")
 	}
 	return team, err

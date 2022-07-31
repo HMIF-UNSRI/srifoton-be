@@ -68,7 +68,7 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 	}
 
 	go usecase.mailManager.SendMailWithAttachment([]string{leader.Email}, []string{}, "Invoice",
-		mailCommon.TextInvoice(team, leader.Name, memberOne.Name, memberTwo.Name), filePath, fileName)
+		mailCommon.TextInvoice(team), filePath, fileName)
 
 	return nil
 }

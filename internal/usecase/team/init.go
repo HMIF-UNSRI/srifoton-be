@@ -117,13 +117,6 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 		return id, err
 	}
 
-	templateStr, err := mailCommon.TextInvoice(team, team.Leader.Name, team.Member1.Name, team.Member2.Name)
-	if err != nil {
-		return "", err
-	}
-
-	go usecase.mailManager.SendMail([]string{team.Leader.Email}, []string{}, "Invoice", templateStr)
-
 	return team.ID, err
 }
 
@@ -150,8 +143,9 @@ func (usecase teamUsecaseImpl) GetAll(ctx context.Context) (teams []httpCommon.T
 			return teams, err
 		}
 		teams[i] = httpCommon.Team{
-			ID:   team.ID,
-			Name: team.Name,
+			ID:         team.ID,
+			Name:       team.Name,
+			IsVerified: team.IsConfirmed,
 			Leader: httpCommon.User{
 				ID:             leader.ID,
 				Name:           leader.Name,
@@ -265,8 +259,9 @@ func (usecase teamUsecaseImpl) GetUnverifiedTeam(ctx context.Context) (teams []h
 			return teams, err
 		}
 		teams[i] = httpCommon.Team{
-			ID:   team.ID,
-			Name: team.Name,
+			ID:         team.ID,
+			Name:       team.Name,
+			IsVerified: team.IsConfirmed,
 			Leader: httpCommon.User{
 				ID:             leader.ID,
 				Name:           leader.Name,
@@ -492,8 +487,9 @@ func (usecase teamUsecaseImpl) GetByPaymentFilename(ctx context.Context, filenam
 	}
 
 	team = httpCommon.Team{
-		ID:   teamByPaymentFilename.ID,
-		Name: teamByPaymentFilename.Name,
+		ID:         teamByPaymentFilename.ID,
+		Name:       teamByPaymentFilename.Name,
+		IsVerified: teamByPaymentFilename.IsConfirmed,
 		Leader: httpCommon.User{
 			ID:             leader.ID,
 			Name:           leader.Name,
@@ -604,8 +600,9 @@ func (usecase teamUsecaseImpl) GetByTeamName(ctx context.Context, teamName strin
 	}
 
 	team = httpCommon.Team{
-		ID:   teamByTeamName.ID,
-		Name: teamByTeamName.Name,
+		ID:         teamByTeamName.ID,
+		Name:       teamByTeamName.Name,
+		IsVerified: teamByTeamName.IsConfirmed,
 		Leader: httpCommon.User{
 			ID:             leader.ID,
 			Name:           leader.Name,

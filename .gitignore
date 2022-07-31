@@ -16,3 +16,4 @@ log
 *.pdf
 
 !_docs/exported_uml/*.png
+!assets/*.jpg
