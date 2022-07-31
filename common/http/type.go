@@ -88,6 +88,7 @@ type (
 		ID          string   `json:"id"`
 		Name        string   `json:"team_name"`
 		Competition string   `json:"competition"`
+		IsVerified  bool     `json:"is_verified"`
 		Leader      User     `json:"leader"`
 		Members     []Member `json:"members"`
 		Payment     Upload   `json:"payment"`
