@@ -2,10 +2,10 @@ package main
 
 import (
 	"fmt"
+	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"log"
 	"time"
 
-	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
@@ -40,7 +40,6 @@ func main() {
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 
-	httpServer.Router.Use(httpCommon.MiddlewareErrorHandler())
 	httpServer.Router.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Length", "Content-Type", "Authorization"},
@@ -51,7 +50,7 @@ func main() {
 	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = uploadDelivery.MaxFileSize
 
-	root := httpServer.Router.Group("/api")
+	root := httpServer.Router.Group("/api", httpCommon.MiddlewareErrorHandler())
 
 	uploadRepository := uploadRepo.NewPostgresUploadRepositoryImpl(db)
 	uploadUsecase := uploadUc.NewUploadUsecaseImpl(uploadRepository)
