@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/smtp"
 	"strings"
@@ -48,14 +47,9 @@ func NewMailManager(email string, password string, host string, port int) *MailM
 	return &MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port}
 }
 
-func (m MailManager) SendMail(to []string, cc []string, subject string, message string) (err error) {
-	// Set up authentication information.
-	// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
-	auth := LoginAuth(m.Email, m.Password)
-
+func (m MailManager) SendMail(to []string, cc []string, subject string, message string) {
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
-
 	bodyMessage := "To: " + strings.Join(to, ",") + "\n" +
 		"Cc: " + strings.Join(cc, ",") + "\n" +
 		"Subject: " + subject + "\n" +
@@ -65,45 +59,41 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
 
-	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), []byte(bodyMessage))
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
+	maxRetry, count := 3, 0
+	for count < maxRetry {
+		// Set up authentication information.
+		// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
+		auth := LoginAuth(m.Email, m.Password)
+		err := smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), []byte(bodyMessage))
+		if err == nil {
+			break
+		}
+		count++
 	}
-	return err
 }
 
-func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject string, message string, filePath string, fileName string) (err error) {
-	// Set up authentication information.
-	// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
-	auth := LoginAuth(m.Email, m.Password)
-
+func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject string, message string, filePath string, fileName string) {
+	maxRetry, count := 2, 0
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
-
 	fileBytes, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		log.Fatalf("Error: %v", err)
+		panic(err)
 	}
 
 	fileMIMEType := http.DetectContentType(fileBytes)
-
 	fileData := base64.StdEncoding.EncodeToString(fileBytes)
-
 	boundary := RandStr(32, "alphanum")
-
 	bodyMessage := []byte("Content-Type: multipart/mixed; boundary=" + boundary + " \n" +
 		"MIME-Version: 1.0\n" +
 		"to: " + strings.Join(to, ",") + "\n" +
 		"subject: " + subject + "\n\n" +
-
 		"--" + boundary + "\n" +
 		"Content-Type: text/plain; charset=" + string('"') + "UTF-8" + string('"') + "\n" +
 		"MIME-Version: 1.0\n" +
 		"Content-Transfer-Encoding: 7bit\n\n" +
 		message + "\n\n" +
 		"--" + boundary + "\n" +
-
 		"Content-Type: " + fileMIMEType + "; name=" + string('"') + fileName + string('"') + " \n" +
 		"MIME-Version: 1.0\n" +
 		"Content-Transfer-Encoding: base64\n" +
@@ -112,11 +102,16 @@ func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject st
 		"--" + boundary + "--")
 
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
+	
+	for count < maxRetry {
+		// Set up authentication information.
+		// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
+		auth := LoginAuth(m.Email, m.Password)
 
-	err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), bodyMessage)
-	if err != nil {
-		fmt.Println(err.Error())
-		return err
+		err = smtp.SendMail(smtpAddr, auth, m.Email, append(to, cc...), bodyMessage)
+		if err == nil {
+			break
+		}
+		count++
 	}
-	return err
 }
