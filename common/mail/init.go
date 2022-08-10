@@ -47,7 +47,7 @@ func NewMailManager(email string, password string, host string, port int) *MailM
 	return &MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port}
 }
 
-func (m MailManager) SendMail(to []string, cc []string, subject string, message string) {
+func (m MailManager) SendMail(to []string, cc []string, subject string, message string, maxRetry int) {
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	bodyMessage := "To: " + strings.Join(to, ",") + "\n" +
@@ -59,7 +59,7 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
 
-	maxRetry, count := 3, 0
+	count := 0
 	for count < maxRetry {
 		// Set up authentication information.
 		// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
@@ -72,8 +72,8 @@ func (m MailManager) SendMail(to []string, cc []string, subject string, message 
 	}
 }
 
-func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject string, message string, filePath string, fileName string) {
-	maxRetry, count := 2, 0
+func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject string, message string, filePath string, fileName string, maxRetry int) {
+	count := 0
 	// Connect to the server, authenticate, set the sender and recipient,
 	// and send the email all in one step.
 	fileBytes, err := ioutil.ReadFile(filePath)
@@ -102,7 +102,7 @@ func (m MailManager) SendMailWithAttachment(to []string, cc []string, subject st
 		"--" + boundary + "--")
 
 	smtpAddr := fmt.Sprintf("%s:%d", m.SmtpHost, m.SmtpPort)
-	
+
 	for count < maxRetry {
 		// Set up authentication information.
 		// auth := smtp.PlainAuth("", m.Email, m.Password, m.SmtpHost)
