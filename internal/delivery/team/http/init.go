@@ -46,8 +46,12 @@ func (h HTTPTeamDelivery) register(c *gin.Context) {
 	fmt.Println("Ini Member 1 : " + member1.Name)
 	member2 := h.mapMemberBodyToDomain(requestBody.Member2)
 	fmt.Println("Ini Member 2 : " + member2.Name)
+	member3 := h.mapMemberBodyToDomain(requestBody.Member3)
+	fmt.Println("Ini Member 3 : " + member3.Name)
+	member4 := h.mapMemberBodyToDomain(requestBody.Member4)
+	fmt.Println("Ini Member 4 : " + member4.Name)
 
-	id, err := h.teamUsecase.Register(ctx, h.mapTeamBodyToDomain(member1, member2, requestBody))
+	id, err := h.teamUsecase.Register(ctx, h.mapTeamBodyToDomain(member1, member2, member3, member4, requestBody))
 	if err != nil {
 		c.Error(err)
 		return

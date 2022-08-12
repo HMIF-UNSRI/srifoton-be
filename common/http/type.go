@@ -101,5 +101,7 @@ type (
 		Competition string    `json:"competition" binding:"required"`
 		Member1     AddMember `json:"member_1"`
 		Member2     AddMember `json:"member_2"`
+		Member3     AddMember `json:"member_3"`
+		Member4     AddMember `json:"member_4"`
 	}
 )

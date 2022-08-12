@@ -21,7 +21,7 @@ func (h HTTPTeamDelivery) mapMemberBodyToDomain(m httpCommon.AddMember) memberDo
 	return member
 }
 
-func (h HTTPTeamDelivery) mapTeamBodyToDomain(member1 memberDomain.Member, member2 memberDomain.Member, t httpCommon.AddTeam) teamDomain.Team {
+func (h HTTPTeamDelivery) mapTeamBodyToDomain(member1, member2, member3, member4 memberDomain.Member, t httpCommon.AddTeam) teamDomain.Team {
 	team := teamDomain.Team{
 		Name: t.Name,
 		Leader: teamDomain.User{
@@ -29,6 +29,9 @@ func (h HTTPTeamDelivery) mapTeamBodyToDomain(member1 memberDomain.Member, membe
 		},
 		Member1: member1,
 		Member2: member2,
+		Member3: member3,
+		Member4: member4,
+
 		Payment: teamDomain.Upload{
 			ID: t.PaymentID,
 		},
