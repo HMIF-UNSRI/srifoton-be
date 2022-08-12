@@ -97,7 +97,7 @@ func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string)
 	}
 
 	// Fired and forgot method, TODO_FEATURE:implement retry sending email if got an error
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password", templateStr)
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Forgot Password", templateStr, 1)
 
 	return user.ID, err
 }
@@ -209,6 +209,6 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		return err
 	}
 
-	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation", templateStr)
+	go usecase.mailManager.SendMail([]string{user.Email}, []string{}, "Account activation", templateStr, 2)
 	return err
 }
