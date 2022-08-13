@@ -3,6 +3,7 @@ package http
 import (
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -42,6 +43,9 @@ func NewHTTPServer(ginMode string) HTTPServer {
 	if ginMode == "release" {
 		gin.SetMode(ginMode)
 	}
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusAccepted, "Pong")
+	})
 	return HTTPServer{
 		Router: router,
 	}
