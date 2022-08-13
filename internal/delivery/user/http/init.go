@@ -19,6 +19,7 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 
 	router.POST("", handler.register)
 	router.POST("/forgot-password", handler.forgotPassword)
+	router.GET("/ping", handler.pong)
 
 	router.Use(httpCommon.MiddlewareJWT(jwtManager))
 	router.GET("", handler.get)
@@ -26,6 +27,9 @@ func NewHTTPUserDelivery(router *gin.RouterGroup, userUsecase userUsecase.Usecas
 	router.GET("/activate/:token", handler.accountActivate)
 	router.POST("/reset-password", handler.resetPassword)
 	return handler
+}
+func (h HTTPUserDelivery) pong(c *gin.Context) {
+	c.JSON(http.StatusAccepted, "Pong")
 }
 
 func (h HTTPUserDelivery) register(c *gin.Context) {

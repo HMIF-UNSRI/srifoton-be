@@ -14,6 +14,7 @@ type config struct {
 	MailEmail      string `env:"MAIL_EMAIL,unset"`
 	MailPassword   string `env:"MAIL_PASSWORD,unset"`
 	MailSmtpHost   string `env:"MAIL_SMTP_HOST,unset"`
+	GinMode        string `env:"GIN_MODE,unset" envDefault:"debug"`
 	MailSmtpPort   int    `env:"MAIL_SMTP_PORT,unset"`
 }
 

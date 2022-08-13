@@ -34,7 +34,7 @@ import (
 func main() {
 	cfg := env.LoadConfig()
 	db := dbCommon.NewPostgres(cfg.MigrationPath, cfg.PostgresURL)
-	httpServer := httpCommon.NewHTTPServer()
+	httpServer := httpCommon.NewHTTPServer(cfg.GinMode)
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
 	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
