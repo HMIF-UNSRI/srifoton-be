@@ -103,5 +103,6 @@ type (
 		Member2     AddMember `json:"member_2"`
 		Member3     AddMember `json:"member_3"`
 		Member4     AddMember `json:"member_4"`
+		Member5     AddMember `json:"member_5"`
 	}
 )

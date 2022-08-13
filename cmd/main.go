@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"log"
 	"time"
+
+	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
@@ -36,7 +37,7 @@ func main() {
 	httpServer := httpCommon.NewHTTPServer()
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
-	invoiceManager := invoiceCommon.NewInvoiceManager()
+	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 

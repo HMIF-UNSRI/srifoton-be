@@ -21,8 +21,8 @@ func NewPostgresTeamRepositoryImpl(db *sql.DB) postgresTeamRepositoryImpl {
 func (repository postgresTeamRepositoryImpl) Insert(tx *sql.Tx, ctx context.Context, team teamDomain.Team) (id string, err error) {
 
 	row := tx.QueryRowContext(ctx,
-		"INSERT INTO teams(name ,id_lead, competition, id_member1, id_member2, id_member3, id_member4, payment_filename) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
-		team.Name, team.Leader.ID, team.Competition, team.Member1.ID, team.Member2.ID, team.Member3.ID, team.Member4.ID, team.Payment.Filename,
+		"INSERT INTO teams(name ,id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5, payment_filename) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id",
+		team.Name, team.Leader.ID, team.Competition, team.Member1.ID, team.Member2.ID, team.Member3.ID, team.Member4.ID, team.Member5.ID, team.Payment.Filename,
 	)
 
 	err = row.Scan(&id)
@@ -45,7 +45,7 @@ func (repository postgresTeamRepositoryImpl) UpdateVerifiedTeam(ctx context.Cont
 
 func (repository postgresTeamRepositoryImpl) FindAll(ctx context.Context) (team []teamDomain.Team, err error) {
 	rows, err := repository.db.QueryContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, is_confirmed, payment_filename, created_at, updated_at FROM teams;")
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5,is_confirmed, payment_filename, created_at, updated_at FROM teams;")
 
 	if err != nil {
 		return team, err
@@ -55,7 +55,7 @@ func (repository postgresTeamRepositoryImpl) FindAll(ctx context.Context) (team 
 		var teamRow teamDomain.Team
 
 		err = rows.Scan(&teamRow.ID, &teamRow.Name, &teamRow.Leader.ID, &teamRow.Competition, &teamRow.Member1.ID,
-			&teamRow.Member2.ID, &teamRow.Member3.ID, &teamRow.Member4.ID, &teamRow.IsConfirmed, &teamRow.Payment.Filename, &teamRow.CreatedAt, &teamRow.UpdatedAt)
+			&teamRow.Member2.ID, &teamRow.Member3.ID, &teamRow.Member4.ID, &teamRow.Member5.ID, &teamRow.IsConfirmed, &teamRow.Payment.Filename, &teamRow.CreatedAt, &teamRow.UpdatedAt)
 
 		if errors.Is(err, sql.ErrNoRows) {
 			return team, errorCommon.NewNotFoundError("team not found")
@@ -68,7 +68,7 @@ func (repository postgresTeamRepositoryImpl) FindAll(ctx context.Context) (team 
 
 func (repository postgresTeamRepositoryImpl) FindUnverifiedTeam(ctx context.Context) (team []teamDomain.Team, err error) {
 	rows, err := repository.db.QueryContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE is_confirmed = $1;", false)
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE is_confirmed = $1;", false)
 
 	if err != nil {
 		return team, err
@@ -78,7 +78,7 @@ func (repository postgresTeamRepositoryImpl) FindUnverifiedTeam(ctx context.Cont
 		var teamRow teamDomain.Team
 
 		err = rows.Scan(&teamRow.ID, &teamRow.Name, &teamRow.Leader.ID, &teamRow.Competition, &teamRow.Member1.ID,
-			&teamRow.Member2.ID, &teamRow.Member3.ID, &teamRow.Member4.ID, &teamRow.IsConfirmed, &teamRow.Payment.Filename, &teamRow.CreatedAt, &teamRow.UpdatedAt)
+			&teamRow.Member2.ID, &teamRow.Member3.ID, &teamRow.Member4.ID, &teamRow.Member5.ID, &teamRow.IsConfirmed, &teamRow.Payment.Filename, &teamRow.CreatedAt, &teamRow.UpdatedAt)
 		if errors.Is(err, sql.ErrNoRows) {
 			return team, errorCommon.NewNotFoundError("team not found")
 		}
@@ -90,10 +90,10 @@ func (repository postgresTeamRepositoryImpl) FindUnverifiedTeam(ctx context.Cont
 
 func (repository postgresTeamRepositoryImpl) FindByLeaderID(ctx context.Context, id string) (team teamDomain.Team, err error) {
 	row := repository.db.QueryRowContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id_lead = $1 LIMIT 1;", id)
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5 ,is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id_lead = $1 LIMIT 1;", id)
 
 	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
-		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.Member5.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("team not found")
 	}
@@ -102,10 +102,10 @@ func (repository postgresTeamRepositoryImpl) FindByLeaderID(ctx context.Context,
 
 func (repository postgresTeamRepositoryImpl) FindByPaymentFilename(ctx context.Context, filename string) (team teamDomain.Team, err error) {
 	row := repository.db.QueryRowContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE payment_filename = $1 LIMIT 1;", filename)
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE payment_filename = $1 LIMIT 1;", filename)
 
 	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
-		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.Member5.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("team not found")
 	}
@@ -114,10 +114,10 @@ func (repository postgresTeamRepositoryImpl) FindByPaymentFilename(ctx context.C
 
 func (repository postgresTeamRepositoryImpl) FindByTeamName(ctx context.Context, teamName string) (team teamDomain.Team, err error) {
 	row := repository.db.QueryRowContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE name = $1 LIMIT 1;", teamName)
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5,is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE name = $1 LIMIT 1;", teamName)
 
 	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
-		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.Member5.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("team not found")
 	}
@@ -126,10 +126,10 @@ func (repository postgresTeamRepositoryImpl) FindByTeamName(ctx context.Context,
 
 func (repository postgresTeamRepositoryImpl) FindByID(ctx context.Context, id string) (team teamDomain.Team, err error) {
 	row := repository.db.QueryRowContext(ctx,
-		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4 is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id = $1 LIMIT 1;", id)
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id = $1 LIMIT 1;", id)
 
 	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
-		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.Member5.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return team, errorCommon.NewNotFoundError("team not found")
 	}

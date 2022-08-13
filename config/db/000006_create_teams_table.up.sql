@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS teams
     id_member2       uuid REFERENCES members ON DELETE SET NULL ON UPDATE CASCADE,
     id_member3       uuid REFERENCES members ON DELETE SET NULL ON UPDATE CASCADE,
     id_member4       uuid REFERENCES members ON DELETE SET NULL ON UPDATE CASCADE,
+    id_member5       uuid REFERENCES members ON DELETE SET NULL ON UPDATE CASCADE,
     created_at       timestamp        NOT NULL DEFAULT (NOW()),
     updated_at       timestamp        NOT NULL DEFAULT (NOW())
 );

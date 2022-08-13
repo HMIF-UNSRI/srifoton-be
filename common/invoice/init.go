@@ -15,10 +15,10 @@ type InvoiceManager struct {
 	Config Config
 }
 
-func NewInvoiceManager() *InvoiceManager {
+func NewInvoiceManager(invoicePath string) *InvoiceManager {
 	var config Config
 	viper.SetConfigFile("json")
-	viper.AddConfigPath("./config/invoice")
+	viper.AddConfigPath(invoicePath)
 	viper.SetConfigName("app.config")
 
 	err := viper.ReadInConfig()
