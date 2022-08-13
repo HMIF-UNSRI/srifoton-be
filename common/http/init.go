@@ -1,14 +1,16 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type HTTPServer struct {
@@ -36,8 +38,14 @@ func init() {
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
 }
 
-func NewHTTPServer() HTTPServer {
+func NewHTTPServer(ginMode string) HTTPServer {
 	router := gin.Default()
+	if ginMode == "release" {
+		gin.SetMode(ginMode)
+	}
+	router.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusAccepted, "Pong")
+	})
 	return HTTPServer{
 		Router: router,
 	}

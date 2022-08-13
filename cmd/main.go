@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"log"
 	"time"
+
+	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
@@ -33,10 +34,10 @@ import (
 func main() {
 	cfg := env.LoadConfig()
 	db := dbCommon.NewPostgres(cfg.MigrationPath, cfg.PostgresURL)
-	httpServer := httpCommon.NewHTTPServer()
+	httpServer := httpCommon.NewHTTPServer(cfg.GinMode)
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
-	invoiceManager := invoiceCommon.NewInvoiceManager()
+	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 

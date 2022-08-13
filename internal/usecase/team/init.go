@@ -36,7 +36,7 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 	}
 
 	// Save member
-	var member1ID, member2ID string
+	var member1ID, member2ID, member3ID, member4ID, member5ID string
 	if team.Member1 != (memberDomain.Member{}) {
 		team.Member1.KPM, err = usecase.uploadRepository.FindByID(ctx, team.Member1.KPM.ID)
 		if err != nil {
@@ -81,6 +81,86 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 			String: member2ID,
 			Valid:  true,
 		}
+	}
+
+	if team.GetUCompetitionTypeString() == "E-Sport" {
+		fmt.Println("Masuk Bang")
+		if team.Member3 != (memberDomain.Member{}) {
+			team.Member3.KPM, err = usecase.uploadRepository.FindByID(ctx, team.Member3.KPM.ID)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+
+			fmt.Println("Member 3 KPM")
+
+			member3ID, err = usecase.memberRepository.Insert(tx, ctx, team.Member3)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+
+			fmt.Println("Insert Member 3")
+			team.Member3.ID = sql.NullString{
+				String: member3ID,
+				Valid:  true,
+			}
+		}
+
+		if team.Member4 != (memberDomain.Member{}) {
+			team.Member4.KPM, err = usecase.uploadRepository.FindByID(ctx, team.Member4.KPM.ID)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+
+			fmt.Println("Member 4 KPM")
+
+			member4ID, err = usecase.memberRepository.Insert(tx, ctx, team.Member4)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+			fmt.Println("Insert Member 4")
+			team.Member4.ID = sql.NullString{
+				String: member4ID,
+				Valid:  true,
+			}
+		}
+
+		if team.Member5 != (memberDomain.Member{}) {
+			team.Member5.KPM, err = usecase.uploadRepository.FindByID(ctx, team.Member5.KPM.ID)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+
+			fmt.Println("Member 5 KPM")
+
+			member5ID, err = usecase.memberRepository.Insert(tx, ctx, team.Member5)
+			if err != nil {
+				if txErr := tx.Rollback(); txErr != nil {
+					return id, txErr
+				}
+				return id, err
+			}
+			fmt.Println("Insert Member 4")
+			team.Member5.ID = sql.NullString{
+				String: member5ID,
+				Valid:  true,
+			}
+		}
+
 	}
 
 	team.Payment, err = usecase.uploadRepository.FindByID(ctx, team.Payment.ID)
@@ -230,6 +310,94 @@ func (usecase teamUsecaseImpl) GetAll(ctx context.Context) (teams []httpCommon.T
 				UpdatedAt: team.Member2.UpdatedAt,
 			})
 		}
+
+		if team.Member3.ID.Valid {
+			team.Member3, err = usecase.memberRepository.FindByID(ctx, team.Member3.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member3.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member3.ID.String,
+				Name:           team.Member3.Name,
+				Email:          team.Member3.Email,
+				Nim:            team.Member3.Nim,
+				University:     team.Member3.University,
+				WhatsappNumber: team.Member3.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member3.CreatedAt,
+				UpdatedAt: team.Member3.UpdatedAt,
+			})
+		}
+
+		if team.Member4.ID.Valid {
+			team.Member4, err = usecase.memberRepository.FindByID(ctx, team.Member4.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member4.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member4.ID.String,
+				Name:           team.Member4.Name,
+				Email:          team.Member4.Email,
+				Nim:            team.Member4.Nim,
+				University:     team.Member4.University,
+				WhatsappNumber: team.Member4.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member4.CreatedAt,
+				UpdatedAt: team.Member4.UpdatedAt,
+			})
+		}
+
+		if team.Member5.ID.Valid {
+			team.Member5, err = usecase.memberRepository.FindByID(ctx, team.Member5.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member5.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member5.ID.String,
+				Name:           team.Member5.Name,
+				Email:          team.Member5.Email,
+				Nim:            team.Member5.Nim,
+				University:     team.Member5.University,
+				WhatsappNumber: team.Member5.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member5.CreatedAt,
+				UpdatedAt: team.Member5.UpdatedAt,
+			})
+		}
+
 	}
 
 	return teams, err
@@ -344,6 +512,93 @@ func (usecase teamUsecaseImpl) GetUnverifiedTeam(ctx context.Context) (teams []h
 				},
 				CreatedAt: team.Member2.CreatedAt,
 				UpdatedAt: team.Member2.UpdatedAt,
+			})
+		}
+
+		if team.Member3.ID.Valid {
+			team.Member3, err = usecase.memberRepository.FindByID(ctx, team.Member3.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member3.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member3.ID.String,
+				Name:           team.Member3.Name,
+				Email:          team.Member3.Email,
+				Nim:            team.Member3.Nim,
+				University:     team.Member3.University,
+				WhatsappNumber: team.Member3.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member3.CreatedAt,
+				UpdatedAt: team.Member3.UpdatedAt,
+			})
+		}
+
+		if team.Member4.ID.Valid {
+			team.Member4, err = usecase.memberRepository.FindByID(ctx, team.Member4.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member4.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member4.ID.String,
+				Name:           team.Member4.Name,
+				Email:          team.Member4.Email,
+				Nim:            team.Member4.Nim,
+				University:     team.Member4.University,
+				WhatsappNumber: team.Member4.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member4.CreatedAt,
+				UpdatedAt: team.Member4.UpdatedAt,
+			})
+		}
+
+		if team.Member5.ID.Valid {
+			team.Member5, err = usecase.memberRepository.FindByID(ctx, team.Member5.ID.String)
+			if err != nil {
+				return teams, err
+			}
+
+			kpm, err := usecase.uploadRepository.FindByFilename(ctx, team.Member5.KPM.Filename)
+			if err != nil {
+				return teams, err
+			}
+
+			teams[i].Members = append(teams[i].Members, httpCommon.Member{
+				ID:             team.Member5.ID.String,
+				Name:           team.Member5.Name,
+				Email:          team.Member5.Email,
+				Nim:            team.Member5.Nim,
+				University:     team.Member5.University,
+				WhatsappNumber: team.Member5.WhatsappNumber,
+				KPM: httpCommon.Upload{
+					ID:        kpm.ID,
+					Url:       kpm.Filename,
+					CreatedAt: kpm.CreatedAt,
+					UpdatedAt: kpm.UpdatedAt,
+				},
+				CreatedAt: team.Member5.CreatedAt,
+				UpdatedAt: team.Member5.UpdatedAt,
 			})
 		}
 	}
@@ -461,6 +716,93 @@ func (usecase teamUsecaseImpl) GetByLeaderID(ctx context.Context, leaderID strin
 		})
 	}
 
+	if teamByLeaderID.Member3.ID.Valid {
+		teamByLeaderID.Member3, err = usecase.memberRepository.FindByID(ctx, teamByLeaderID.Member3.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByLeaderID.Member3.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByLeaderID.Member3.ID.String,
+			Name:           teamByLeaderID.Member3.Name,
+			Email:          teamByLeaderID.Member3.Email,
+			Nim:            teamByLeaderID.Member3.Nim,
+			University:     teamByLeaderID.Member3.University,
+			WhatsappNumber: teamByLeaderID.Member3.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByLeaderID.Member3.CreatedAt,
+			UpdatedAt: teamByLeaderID.Member3.UpdatedAt,
+		})
+	}
+
+	if teamByLeaderID.Member4.ID.Valid {
+		teamByLeaderID.Member4, err = usecase.memberRepository.FindByID(ctx, teamByLeaderID.Member4.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByLeaderID.Member4.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByLeaderID.Member4.ID.String,
+			Name:           teamByLeaderID.Member4.Name,
+			Email:          teamByLeaderID.Member4.Email,
+			Nim:            teamByLeaderID.Member4.Nim,
+			University:     teamByLeaderID.Member4.University,
+			WhatsappNumber: teamByLeaderID.Member4.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByLeaderID.Member4.CreatedAt,
+			UpdatedAt: teamByLeaderID.Member4.UpdatedAt,
+		})
+	}
+
+	if teamByLeaderID.Member5.ID.Valid {
+		teamByLeaderID.Member5, err = usecase.memberRepository.FindByID(ctx, teamByLeaderID.Member5.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByLeaderID.Member5.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByLeaderID.Member5.ID.String,
+			Name:           teamByLeaderID.Member5.Name,
+			Email:          teamByLeaderID.Member5.Email,
+			Nim:            teamByLeaderID.Member5.Nim,
+			University:     teamByLeaderID.Member5.University,
+			WhatsappNumber: teamByLeaderID.Member5.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByLeaderID.Member5.CreatedAt,
+			UpdatedAt: teamByLeaderID.Member5.UpdatedAt,
+		})
+	}
+
 	return team, err
 
 }
@@ -574,6 +916,93 @@ func (usecase teamUsecaseImpl) GetByPaymentFilename(ctx context.Context, filenam
 		})
 	}
 
+	if teamByPaymentFilename.Member3.ID.Valid {
+		teamByPaymentFilename.Member3, err = usecase.memberRepository.FindByID(ctx, teamByPaymentFilename.Member3.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByPaymentFilename.Member3.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByPaymentFilename.Member3.ID.String,
+			Name:           teamByPaymentFilename.Member3.Name,
+			Email:          teamByPaymentFilename.Member3.Email,
+			Nim:            teamByPaymentFilename.Member3.Nim,
+			University:     teamByPaymentFilename.Member3.University,
+			WhatsappNumber: teamByPaymentFilename.Member3.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByPaymentFilename.Member3.CreatedAt,
+			UpdatedAt: teamByPaymentFilename.Member3.UpdatedAt,
+		})
+	}
+
+	if teamByPaymentFilename.Member4.ID.Valid {
+		teamByPaymentFilename.Member4, err = usecase.memberRepository.FindByID(ctx, teamByPaymentFilename.Member4.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByPaymentFilename.Member4.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByPaymentFilename.Member4.ID.String,
+			Name:           teamByPaymentFilename.Member4.Name,
+			Email:          teamByPaymentFilename.Member4.Email,
+			Nim:            teamByPaymentFilename.Member4.Nim,
+			University:     teamByPaymentFilename.Member4.University,
+			WhatsappNumber: teamByPaymentFilename.Member4.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByPaymentFilename.Member4.CreatedAt,
+			UpdatedAt: teamByPaymentFilename.Member4.UpdatedAt,
+		})
+	}
+
+	if teamByPaymentFilename.Member5.ID.Valid {
+		teamByPaymentFilename.Member5, err = usecase.memberRepository.FindByID(ctx, teamByPaymentFilename.Member5.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByPaymentFilename.Member5.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByPaymentFilename.Member5.ID.String,
+			Name:           teamByPaymentFilename.Member5.Name,
+			Email:          teamByPaymentFilename.Member5.Email,
+			Nim:            teamByPaymentFilename.Member5.Nim,
+			University:     teamByPaymentFilename.Member5.University,
+			WhatsappNumber: teamByPaymentFilename.Member5.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByPaymentFilename.Member5.CreatedAt,
+			UpdatedAt: teamByPaymentFilename.Member5.UpdatedAt,
+		})
+	}
+
 	return team, err
 
 }
@@ -684,6 +1113,93 @@ func (usecase teamUsecaseImpl) GetByTeamName(ctx context.Context, teamName strin
 			},
 			CreatedAt: teamByTeamName.Member2.CreatedAt,
 			UpdatedAt: teamByTeamName.Member2.UpdatedAt,
+		})
+	}
+
+	if teamByTeamName.Member3.ID.Valid {
+		teamByTeamName.Member3, err = usecase.memberRepository.FindByID(ctx, teamByTeamName.Member3.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByTeamName.Member3.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByTeamName.Member3.ID.String,
+			Name:           teamByTeamName.Member3.Name,
+			Email:          teamByTeamName.Member3.Email,
+			Nim:            teamByTeamName.Member3.Nim,
+			University:     teamByTeamName.Member3.University,
+			WhatsappNumber: teamByTeamName.Member3.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByTeamName.Member3.CreatedAt,
+			UpdatedAt: teamByTeamName.Member3.UpdatedAt,
+		})
+	}
+
+	if teamByTeamName.Member4.ID.Valid {
+		teamByTeamName.Member4, err = usecase.memberRepository.FindByID(ctx, teamByTeamName.Member4.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByTeamName.Member4.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByTeamName.Member4.ID.String,
+			Name:           teamByTeamName.Member4.Name,
+			Email:          teamByTeamName.Member4.Email,
+			Nim:            teamByTeamName.Member4.Nim,
+			University:     teamByTeamName.Member4.University,
+			WhatsappNumber: teamByTeamName.Member4.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByTeamName.Member4.CreatedAt,
+			UpdatedAt: teamByTeamName.Member4.UpdatedAt,
+		})
+	}
+
+	if teamByTeamName.Member5.ID.Valid {
+		teamByTeamName.Member5, err = usecase.memberRepository.FindByID(ctx, teamByTeamName.Member5.ID.String)
+		if err != nil {
+			return team, err
+		}
+
+		kpm, err := usecase.uploadRepository.FindByFilename(ctx, teamByTeamName.Member5.KPM.Filename)
+		if err != nil {
+			return team, err
+		}
+
+		team.Members = append(team.Members, httpCommon.Member{
+			ID:             teamByTeamName.Member5.ID.String,
+			Name:           teamByTeamName.Member5.Name,
+			Email:          teamByTeamName.Member5.Email,
+			Nim:            teamByTeamName.Member5.Nim,
+			University:     teamByTeamName.Member5.University,
+			WhatsappNumber: teamByTeamName.Member5.WhatsappNumber,
+			KPM: httpCommon.Upload{
+				ID:        kpm.ID,
+				Url:       kpm.Filename,
+				CreatedAt: kpm.CreatedAt,
+				UpdatedAt: kpm.UpdatedAt,
+			},
+			CreatedAt: teamByTeamName.Member5.CreatedAt,
+			UpdatedAt: teamByTeamName.Member5.UpdatedAt,
 		})
 	}
 

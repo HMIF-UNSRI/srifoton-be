@@ -2,6 +2,7 @@ package admin
 
 import (
 	"context"
+	"fmt"
 
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
@@ -37,6 +38,7 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 
 	team, err := usecase.teamRepository.FindByID(ctx, id)
 	if err != nil {
+		fmt.Println("Salah di get team by id")
 		return errorCommon.NewInvariantError(err.Error())
 	}
 	leader, err = usecase.userRepository.FindByID(ctx, team.Leader.ID)
