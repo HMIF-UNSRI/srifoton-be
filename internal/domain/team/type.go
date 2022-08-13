@@ -16,6 +16,9 @@ type (
 		Competition competition
 		Member1     Member
 		Member2     Member
+		Member3     Member
+		Member4     Member
+		Member5     Member
 		Payment     Upload
 
 		Timestamp

@@ -3,13 +3,6 @@ package main
 import (
 	"fmt"
 	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
-	"github.com/gin-contrib/static"
-	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
-	"strings"
-	"time"
-
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
@@ -32,15 +25,21 @@ import (
 	uploadUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/upload"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"strings"
+	"time"
 )
 
 func main() {
 	cfg := env.LoadConfig()
 	db := dbCommon.NewPostgres(cfg.MigrationPath, cfg.PostgresURL)
-	httpServer := httpCommon.NewHTTPServer()
+	httpServer := httpCommon.NewHTTPServer(cfg.GinMode)
 	passwordManager := passwordCommon.NewPasswordHashManager()
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
-	invoiceManager := invoiceCommon.NewInvoiceManager()
+	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
 		cfg.MailSmtpHost, cfg.MailSmtpPort)
 

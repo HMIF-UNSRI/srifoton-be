@@ -1,21 +1,25 @@
 package http
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
 	"io"
 	"log"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 type HTTPServer struct {
 	Router *gin.Engine
 }
 
-func init() {
+func NewHTTPServer(ginMode string) HTTPServer {
+	if ginMode == "release" {
+		gin.SetMode(ginMode)
+	}
 	if ve, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		ve.RegisterTagNameFunc(func(fld reflect.StructField) string {
 			name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
@@ -34,9 +38,7 @@ func init() {
 	gin.DisableConsoleColor()
 	gin.EnableJsonDecoderDisallowUnknownFields()
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
-}
 
-func NewHTTPServer() HTTPServer {
 	router := gin.Default()
 	return HTTPServer{
 		Router: router,
