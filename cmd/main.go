@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
+	"strings"
+	"time"
+
 	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
@@ -27,10 +32,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
-	"log"
-	"net/http"
-	"strings"
-	"time"
 )
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
 	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
-		cfg.MailSmtpHost, cfg.MailSmtpPort, cfg.BaseUrl, cfg.BaseIPUrl)
+		cfg.MailSmtpHost, cfg.MailSmtpPort, cfg.BaseUrl)
 
 	httpServer.Router.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},
