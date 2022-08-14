@@ -2,11 +2,12 @@ package http
 
 import (
 	"fmt"
+	"mime/multipart"
+	"path/filepath"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"mime/multipart"
-	"path/filepath"
 )
 
 func (h HTTPUploadDelivery) saveFile(c *gin.Context, fileHeader *multipart.FileHeader, datatype string) (filename string, err error) {
@@ -16,7 +17,7 @@ func (h HTTPUploadDelivery) saveFile(c *gin.Context, fileHeader *multipart.FileH
 
 	ext := filepath.Ext(fileHeader.Filename)
 	if ext != ".png" && ext != ".jpg" && ext != ".jpeg" {
-		return filename, errorCommon.NewInvariantError("only png, jpeg, jpg or pdf extension is supported")
+		return filename, errorCommon.NewInvariantError("only png, jpg or jpeg extension is supported")
 	}
 
 	filename = fmt.Sprintf("%s_%s%s", datatype, uuid.NewString(), ext)
