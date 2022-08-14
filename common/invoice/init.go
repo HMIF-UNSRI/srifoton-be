@@ -28,13 +28,13 @@ func NewInvoiceManager(invoicePath string) *InvoiceManager {
 
 	textName := []string{
 		"date", "team_name", "leader_name",
-		"member1_name", "member2_name",
+		"member1_name", "member2_name", "member3_name", "member4_name", "member5_name",
 		"competition_name",
 		"competition_price",
 		"competition_total_price",
 		"total_payment",
 	}
-	textProperties := make([]Properties, 9)
+	textProperties := make([]Properties, 12)
 	for i := 0; i < len(textProperties); i++ {
 		textProperties[i] = Properties{
 			FontPath:  viper.GetString("config." + textName[i] + ".font_path"),

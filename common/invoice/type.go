@@ -22,6 +22,9 @@ type InvoiceDetails struct {
 	LeaderName      string
 	MemberOne       string
 	MemberTwo       string
+	MemberThree     string
+	MemberFour      string
+	MemberFive      string
 	CompetitionName string
 	Price           string
 }

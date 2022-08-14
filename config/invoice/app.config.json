@@ -25,45 +25,66 @@
     },
     "member1_name": {
       "font_path": "./assets/RedRose-Regular.ttf",
-      "font_size": 17,
+      "font_size": 14,
       "position_x": 170,
-      "position_y": 336,
+      "position_y": 333,
       "color_rgb": "0,0,0"
     },
     "member2_name": {
       "font_path": "./assets/RedRose-Regular.ttf",
-      "font_size": 17,
+      "font_size": 14,
       "position_x": 170,
-      "position_y": 365,
+      "position_y": 357,
+      "color_rgb": "0,0,0"
+    },
+    "member3_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 14,
+      "position_x": 170,
+      "position_y": 381,
+      "color_rgb": "0,0,0"
+    },
+    "member4_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 14,
+      "position_x": 170,
+      "position_y": 405,
+      "color_rgb": "0,0,0"
+    },
+    "member5_name": {
+      "font_path": "./assets/RedRose-Regular.ttf",
+      "font_size": 14,
+      "position_x": 60,
+      "position_y": 429,
       "color_rgb": "0,0,0"
     },
     "competition_name": {
       "font_path": "./assets/RedRose-Regular.ttf",
       "font_size": 17,
       "position_x": 65,
-      "position_y": 475,
+      "position_y": 530,
       "color_rgb": "0,0,0"
     },
     "competition_price": {
       "font_path": "./assets/RedRose-Regular.ttf",
       "font_size": 17,
       "position_x": 337,
-      "position_y": 475,
+      "position_y": 530,
       "color_rgb": "0,0,0"
     },
     "competition_total_price": {
       "font_path": "./assets/RedRose-Regular.ttf",
       "font_size": 17,
       "position_x": 435,
-      "position_y": 475,
+      "position_y": 530,
       "color_rgb": "0,0,0"
     },
     "total_payment": {
       "font_path": "./assets/RedRose-Regular.ttf",
       "font_size": 17,
       "position_x": 435,
-      "position_y": 561,
-      "color_rgb": "0,0,0"
+      "position_y": 603,
+      "color_rgb": "255,255,255"
     }
   }
 }
