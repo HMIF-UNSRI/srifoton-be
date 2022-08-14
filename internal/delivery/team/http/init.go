@@ -37,6 +37,7 @@ func (h HTTPTeamDelivery) register(c *gin.Context) {
 
 	var requestBody httpCommon.AddTeam
 	if err := c.BindJSON(&requestBody); err != nil {
+		c.Error(err)
 		return
 	}
 	requestBody.LeadID = leadID

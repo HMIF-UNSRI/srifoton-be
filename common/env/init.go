@@ -7,6 +7,8 @@ import (
 
 type config struct {
 	Port           int    `env:"PORT,unset" envDefault:"8000"`
+	BaseUrl        string `env:"BASE_URL,unset"`
+	BaseIPUrl      string `env:"BASE_IP_URL,unset"`
 	PostgresURL    string `env:"POSTGRES_CONNECTION_URL,unset"`
 	MigrationPath  string `env:"POSTGRES_MIGRATION_PATH,unset"`
 	InvoicePath    string `env:"INVOICE_CONFIG_PATH,unset"`

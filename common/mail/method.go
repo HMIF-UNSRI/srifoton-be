@@ -15,17 +15,19 @@ var templates embed.FS
 
 var parsedTemplates = template.Must(template.ParseFS(templates, "templates/*.gohtml"))
 
-func TextRegisterCompletion(nama, token string) (string, error) {
+func (m MailManager) TextRegisterCompletion(nama, token string) (string, error) {
 	service := RegisterService{
 		Name:  nama,
 		Token: token,
+		URL:   m.BaseURL,
 	}
 	return ParseRegisterTemplate(service)
 }
 
-func TextResetPassword(token string) (string, error) {
+func (m MailManager) TextResetPassword(token string) (string, error) {
 	service := ForgotPasswordService{
 		Token: token,
+		URL:   m.BaseIPURL,
 	}
 	return ParseForgotPasswordTemplate(service)
 }

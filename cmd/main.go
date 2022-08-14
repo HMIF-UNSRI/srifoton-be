@@ -41,7 +41,7 @@ func main() {
 	jwtManager := jwtCommon.NewJWTManager(cfg.AccessTokenKey)
 	invoiceManager := invoiceCommon.NewInvoiceManager(cfg.InvoicePath)
 	mailManager := mailCommon.NewMailManager(cfg.MailEmail, cfg.MailPassword,
-		cfg.MailSmtpHost, cfg.MailSmtpPort)
+		cfg.MailSmtpHost, cfg.MailSmtpPort, cfg.BaseUrl, cfg.BaseIPUrl)
 
 	httpServer.Router.Use(cors.New(cors.Config{
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "OPTIONS"},

@@ -13,9 +13,11 @@ type (
 	RegisterService struct {
 		Name  string
 		Token string
+		URL   string
 	}
 
 	ForgotPasswordService struct {
 		Token string
+		URL   string
 	}
 )

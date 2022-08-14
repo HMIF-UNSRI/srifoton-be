@@ -11,10 +11,12 @@ import (
 )
 
 type MailManager struct {
-	Email    string
-	Password string
-	SmtpHost string
-	SmtpPort int
+	Email     string
+	Password  string
+	SmtpHost  string
+	SmtpPort  int
+	BaseURL   string
+	BaseIPURL string
 }
 
 type loginAuth struct {
@@ -43,8 +45,8 @@ func (a *loginAuth) Next(fromServer []byte, more bool) ([]byte, error) {
 	return nil, nil
 }
 
-func NewMailManager(email string, password string, host string, port int) *MailManager {
-	return &MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port}
+func NewMailManager(email string, password string, host string, port int, BaseUrl string, BaseIpUrl string) *MailManager {
+	return &MailManager{Email: email, Password: password, SmtpHost: host, SmtpPort: port, BaseURL: BaseUrl, BaseIPURL: BaseIpUrl}
 }
 
 func (m MailManager) SendMail(to []string, cc []string, subject string, message string, maxRetry int) {
