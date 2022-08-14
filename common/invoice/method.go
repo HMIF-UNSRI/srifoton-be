@@ -11,13 +11,13 @@ func CreateInvoiceDetails(t teamDomain.Team) InvoiceDetails {
 	var price string
 	switch string(t.Competition) {
 	case "CP":
-		price = "100000"
+		price = "Rp100000"
 	case "UI/UX":
-		price = "80000"
+		price = "Rp80000"
 	case "WEB":
-		price = "60000"
+		price = "Rp60000"
 	case "ESPORT":
-		price = "50000"
+		price = "Rp50000"
 	}
 
 	invoiceDetails := InvoiceDetails{
@@ -26,6 +26,9 @@ func CreateInvoiceDetails(t teamDomain.Team) InvoiceDetails {
 		LeaderName:      t.Leader.Name,
 		MemberOne:       t.Member1.Name,
 		MemberTwo:       t.Member2.Name,
+		MemberThree:     t.Member3.Name,
+		MemberFour:      t.Member4.Name,
+		MemberFive:      "Anggota 5   : " + t.Member5.Name,
 		CompetitionName: t.GetUCompetitionTypeString(),
 		Price:           price,
 	}
@@ -39,6 +42,9 @@ func (i InvoiceDetails) MapToArray() []string {
 		i.LeaderName,
 		i.MemberOne,
 		i.MemberTwo,
+		i.MemberThree,
+		i.MemberFour,
+		i.MemberFive,
 		i.CompetitionName,
 		i.Price,
 		i.Price,
