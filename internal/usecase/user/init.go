@@ -91,7 +91,7 @@ func (usecase userUsecaseImpl) ForgotPassword(ctx context.Context, email string)
 		return id, err
 	}
 
-	templateStr, err := mailCommon.TextResetPassword(token)
+	templateStr, err := usecase.mailManager.TextResetPassword(token)
 	if err != nil {
 		return id, err
 	}
@@ -204,7 +204,7 @@ func (usecase userUsecaseImpl) sendMailActivation(ctx context.Context, email str
 		return err
 	}
 
-	templateStr, err := mailCommon.TextRegisterCompletion(user.Name, token)
+	templateStr, err := usecase.mailManager.TextRegisterCompletion(user.Name, token)
 	if err != nil {
 		return err
 	}
