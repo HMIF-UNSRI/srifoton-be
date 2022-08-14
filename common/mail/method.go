@@ -27,7 +27,7 @@ func (m MailManager) TextRegisterCompletion(nama, token string) (string, error) 
 func (m MailManager) TextResetPassword(token string) (string, error) {
 	service := ForgotPasswordService{
 		Token: token,
-		URL:   m.BaseIPURL,
+		URL:   m.BaseURL,
 	}
 	return ParseForgotPasswordTemplate(service)
 }
@@ -70,8 +70,23 @@ func TextInvoice(team teamDomain.Team) string {
 	// 	Date:        time.Now().Format("2006 January 02 15:04:05"),
 	// }
 	competition := team.GetUCompetitionTypeString()
-	message := fmt.Sprintf(InvoiceEmailBody, team.Name, competition)
+	waGroupLink := getWaGroupLink(competition)
+	message := fmt.Sprintf(InvoiceEmailBody, team.Name, competition, competition, waGroupLink)
 	return message
+}
+
+func getWaGroupLink(competition string) string {
+	switch competition {
+	case "Competitive Programming":
+		return CP
+	case "Web Development":
+		return WEB
+	case "UI/UX Design":
+		return UIUX
+	case "E-Sport":
+		return ESPORT
+	}
+	return "Please DM or Contact your competition's contact person to get the link"
 }
 
 func ParseRegisterTemplate(data RegisterService) (string, error) {
