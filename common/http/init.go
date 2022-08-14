@@ -3,7 +3,6 @@ package http
 import (
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"reflect"
 	"strings"
@@ -17,7 +16,10 @@ type HTTPServer struct {
 	Router *gin.Engine
 }
 
-func init() {
+func NewHTTPServer(ginMode string) HTTPServer {
+	if ginMode == "release" {
+		gin.SetMode(ginMode)
+	}
 	if ve, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		ve.RegisterTagNameFunc(func(fld reflect.StructField) string {
 			name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
@@ -36,16 +38,8 @@ func init() {
 	gin.DisableConsoleColor()
 	gin.EnableJsonDecoderDisallowUnknownFields()
 	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
-}
 
-func NewHTTPServer(ginMode string) HTTPServer {
 	router := gin.Default()
-	if ginMode == "release" {
-		gin.SetMode(ginMode)
-	}
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusAccepted, "Pong")
-	})
 	return HTTPServer{
 		Router: router,
 	}

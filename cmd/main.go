@@ -2,11 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
-	"time"
-
 	admin "github.com/HMIF-UNSRI/srifoton-be/common/admin"
-
 	"github.com/HMIF-UNSRI/srifoton-be/common/env"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	invoiceCommon "github.com/HMIF-UNSRI/srifoton-be/common/invoice"
@@ -29,6 +25,12 @@ import (
 	uploadUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/upload"
 	userUc "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/user"
 	"github.com/gin-contrib/cors"
+	"github.com/gin-contrib/static"
+	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
+	"strings"
+	"time"
 )
 
 func main() {
@@ -48,9 +50,10 @@ func main() {
 		AllowAllOrigins:  true,
 		MaxAge:           12 * time.Hour,
 	}))
-	httpServer.Router.RedirectTrailingSlash = true
 	httpServer.Router.MaxMultipartMemory = uploadDelivery.MaxFileSize
-
+	staticServer := static.Serve("/", static.LocalFile("./web/build", true))
+	httpServer.Router.Use(staticServer)
+	httpServer.Router.RedirectTrailingSlash = true
 	root := httpServer.Router.Group("/api", httpCommon.MiddlewareErrorHandler())
 
 	uploadRepository := uploadRepo.NewPostgresUploadRepositoryImpl(db)
@@ -76,6 +79,15 @@ func main() {
 	uploadStatic := httpServer.Router.Group("/",
 		httpCommon.MiddlewareJWT(jwtManager), admin.MiddlewareAdminOnly(userUsecase))
 	uploadStatic.Static("/uploads", "./uploads")
+
+	httpServer.Router.NoRoute(func(c *gin.Context) {
+		if c.Request.Method == http.MethodGet &&
+			!strings.ContainsRune(c.Request.URL.Path, '.') &&
+			!strings.HasPrefix(c.Request.URL.Path, "/api/") {
+			c.Request.URL.Path = "/"
+			staticServer(c)
+		}
+	})
 
 	log.Fatalln(httpServer.Router.Run(fmt.Sprintf(":%d", cfg.Port)))
 }

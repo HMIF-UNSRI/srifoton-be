@@ -17,3 +17,5 @@ log
 
 !_docs/exported_uml/*.png
 !assets/*.jpg
+
+web/build
