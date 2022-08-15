@@ -135,3 +135,15 @@ func (repository postgresTeamRepositoryImpl) FindByID(ctx context.Context, id st
 	}
 	return team, err
 }
+
+func (repository postgresTeamRepositoryImpl) FindByMemberID(ctx context.Context, id string) (team teamDomain.Team, err error) {
+	row := repository.db.QueryRowContext(ctx,
+		"SELECT id, name, id_lead, competition, id_member1, id_member2, id_member3, id_member4, id_member5, is_confirmed, payment_filename, created_at, updated_at FROM teams WHERE id_member1 = $1 OR id_member2 = $1 OR id_member3 = $1 OR id_member4 = $1 OR id_member5 = $1 LIMIT 1;", id)
+
+	err = row.Scan(&team.ID, &team.Name, &team.Leader.ID, &team.Competition, &team.Member1.ID,
+		&team.Member2.ID, &team.Member3.ID, &team.Member4.ID, &team.Member5.ID, &team.IsConfirmed, &team.Payment.Filename, &team.CreatedAt, &team.UpdatedAt)
+	if errors.Is(err, sql.ErrNoRows) {
+		return team, errorCommon.NewNotFoundError("team not found")
+	}
+	return team, err
+}

@@ -29,6 +29,18 @@ func NewTeamUsecaseImpl(db *sql.DB, teamRepository teamRepository.Repository, me
 	return teamUsecaseImpl{db: db, teamRepository: teamRepository, memberRepository: memberRepository, userRepository: userRepository, uploadRepository: uploadRepository, mailManager: mailManager}
 }
 
+func (usecase teamUsecaseImpl) checkMember(ctx context.Context, member memberDomain.Member) error {
+
+	memberdb, _ := usecase.memberRepository.FindByNim(ctx, member.Nim)
+
+	if memberdb.ID.Valid {
+		usecase.teamRepository.FindByMemberID(ctx, memberdb.ID.String)
+		return errorCommon.NewForbiddenError("Member with name " + memberdb.Name + " and nim " + memberdb.Nim + " has already in another team")
+	}
+
+	return nil
+}
+
 func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Team) (id string, err error) {
 	// Enable db transaction mode
 	tx, err := usecase.db.Begin()
@@ -36,9 +48,26 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 		return id, err
 	}
 
-	if team.GetUCompetitionTypeString() != "E-Sport" {
-		if team.Member3.ID.Valid || team.Member4.ID.Valid || team.Member5.ID.Valid {
-			return "", errorCommon.NewForbiddenError("Max Member for" + team.GetUCompetitionTypeString() + "is 2")
+	if team.GetUCompetitionTypeString() == "E-Sport" {
+		err = usecase.checkMember(ctx, team.Member1)
+		if err != nil {
+			return "", err
+		}
+		usecase.checkMember(ctx, team.Member2)
+		if err != nil {
+			return "", err
+		}
+		usecase.checkMember(ctx, team.Member3)
+		if err != nil {
+			return "", err
+		}
+		usecase.checkMember(ctx, team.Member4)
+		if err != nil {
+			return "", err
+		}
+		usecase.checkMember(ctx, team.Member5)
+		if err != nil {
+			return "", err
 		}
 	}
 
