@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	mailCommon "github.com/HMIF-UNSRI/srifoton-be/common/mail"
 	memberDomain "github.com/HMIF-UNSRI/srifoton-be/internal/domain/member"
@@ -33,6 +34,12 @@ func (usecase teamUsecaseImpl) Register(ctx context.Context, team teamDomain.Tea
 	tx, err := usecase.db.Begin()
 	if err != nil {
 		return id, err
+	}
+
+	if team.GetUCompetitionTypeString() != "E-Sport" {
+		if team.Member3.ID.Valid || team.Member4.ID.Valid || team.Member5.ID.Valid {
+			return "", errorCommon.NewForbiddenError("Max Member for" + team.GetUCompetitionTypeString() + "is 2")
+		}
 	}
 
 	// Save member
