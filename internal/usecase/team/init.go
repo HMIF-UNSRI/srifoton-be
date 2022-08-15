@@ -34,8 +34,10 @@ func (usecase teamUsecaseImpl) checkMember(ctx context.Context, member memberDom
 	memberdb, _ := usecase.memberRepository.FindByNim(ctx, member.Nim)
 
 	if memberdb.ID.Valid {
-		usecase.teamRepository.FindByMemberID(ctx, memberdb.ID.String)
-		return errorCommon.NewForbiddenError("Member with name " + memberdb.Name + " and nim " + memberdb.Nim + " has already in another team")
+		team, _ := usecase.teamRepository.FindByMemberID(ctx, memberdb.ID.String)
+		if team.GetUCompetitionTypeString() != "" {
+			return errorCommon.NewForbiddenError("Member with name " + memberdb.Name + " and nim " + memberdb.Nim + " has already in another team")
+		}
 	}
 
 	return nil
