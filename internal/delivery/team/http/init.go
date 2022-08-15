@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	httpCommon "github.com/HMIF-UNSRI/srifoton-be/common/http"
 	jwtCommon "github.com/HMIF-UNSRI/srifoton-be/common/jwt"
 	teamUsecase "github.com/HMIF-UNSRI/srifoton-be/internal/usecase/team"
@@ -24,6 +25,7 @@ func NewHTTPTeamDelivery(router *gin.RouterGroup, teamUsecase teamUsecase.Usecas
 }
 
 func (h HTTPTeamDelivery) register(c *gin.Context) {
+
 	inputUserID, ok := c.Get("user_id")
 	if !ok {
 		c.Error(ErrorUserID)
@@ -35,14 +37,37 @@ func (h HTTPTeamDelivery) register(c *gin.Context) {
 		return
 	}
 
+	ctx := c.Request.Context()
+	teamByLeaderID, _ := h.teamUsecase.GetByLeaderID(ctx, leadID)
+
+	if teamByLeaderID.Name != "" {
+		c.Error(errorCommon.NewForbiddenError("You already have a team, Please confirm to your competition contact person if you want to delete your previous team"))
+		return
+	}
+
 	var requestBody httpCommon.AddTeam
 	if err := c.BindJSON(&requestBody); err != nil {
 		c.Error(err)
 		return
 	}
+
+	if requestBody.Competition != "ESPORT" {
+		if requestBody.Member3.Nim != "" || requestBody.Member4.Nim != "" || requestBody.Member5.Nim != "" {
+			c.Error(errorCommon.NewForbiddenError("Max Member for " + requestBody.Competition + "Competition is 2 Member"))
+			return
+		}
+	}
+	fmt.Println(requestBody.Competition)
+	if requestBody.Competition == "ESPORT" {
+		fmt.Println("Masuk sini")
+		if requestBody.Member1.Nim == "" || requestBody.Member2.Nim == "" || requestBody.Member3.Nim == "" || requestBody.Member4.Nim == "" {
+			fmt.Println("Masuk sana")
+			c.Error(errorCommon.NewForbiddenError("Minimum Member For E-Sport Competition is 4 Member"))
+			return
+		}
+	}
 	requestBody.LeadID = leadID
 
-	ctx := c.Request.Context()
 	member1 := h.mapMemberBodyToDomain(requestBody.Member1)
 	fmt.Println("Ini Member 1 : " + member1.Name)
 	member2 := h.mapMemberBodyToDomain(requestBody.Member2)
@@ -52,9 +77,10 @@ func (h HTTPTeamDelivery) register(c *gin.Context) {
 	member4 := h.mapMemberBodyToDomain(requestBody.Member4)
 	fmt.Println("Ini Member 4 : " + member4.Name)
 	member5 := h.mapMemberBodyToDomain(requestBody.Member5)
-	fmt.Println("Ini Member 4 : " + member5.Name)
+	fmt.Println("Ini Member 5 : " + member5.Name)
 
 	id, err := h.teamUsecase.Register(ctx, h.mapTeamBodyToDomain(member1, member2, member3, member4, member5, requestBody))
+
 	if err != nil {
 		c.Error(err)
 		return
