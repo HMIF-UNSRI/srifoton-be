@@ -21,7 +21,7 @@ func CreateInvoiceDetails(t teamDomain.Team) InvoiceDetails {
 	}
 
 	invoiceDetails := InvoiceDetails{
-		Date:            time.Now().Format("02 January 2002"),
+		Date:            time.Now().Format("02 January 2006"),
 		TeamName:        t.Name,
 		LeaderName:      t.Leader.Name,
 		MemberOne:       t.Member1.Name,
