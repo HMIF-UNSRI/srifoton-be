@@ -15,9 +15,9 @@ func CreateInvoiceDetails(t teamDomain.Team) InvoiceDetails {
 	case "UI/UX":
 		price = "Rp80000"
 	case "WEB":
-		price = "Rp60000"
+		price = "Rp80000"
 	case "ESPORT":
-		price = "Rp50000"
+		price = "Rp100000"
 	}
 
 	invoiceDetails := InvoiceDetails{
