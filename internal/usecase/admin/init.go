@@ -35,6 +35,9 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 	var leader userDomain.User
 	var memberOne memberDomain.Member
 	var memberTwo memberDomain.Member
+	var memberThree memberDomain.Member
+	var memberFour memberDomain.Member
+	var memberFive memberDomain.Member
 
 	team, err := usecase.teamRepository.FindByID(ctx, id)
 	if err != nil {
@@ -62,6 +65,30 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 			return errorCommon.NewInvariantError("member two not found")
 		}
 		team.Member2 = memberTwo
+	}
+	
+	if team.Member3.ID.Valid {
+		memberThree, err = usecase.memberRepository.FindByID(ctx, team.Member3.ID.String)
+		if err != nil {
+			return errorCommon.NewInvariantError("member Three not found")
+		}
+		team.Member3 = memberThree
+	}
+
+	if team.Member4.ID.Valid {
+		memberFour, err = usecase.memberRepository.FindByID(ctx, team.Member4.ID.String)
+		if err != nil {
+			return errorCommon.NewInvariantError("member Four not found")
+		}
+		team.Member4 = memberFour
+	}
+
+	if team.Member5.ID.Valid {
+		memberFive, err = usecase.memberRepository.FindByID(ctx, team.Member5.ID.String)
+		if err != nil {
+			return errorCommon.NewInvariantError("member Four not found")
+		}
+		team.Member5 = memberFive
 	}
 
 	err, filePath, fileName := usecase.invoiceManager.CreateInvoice(team)
