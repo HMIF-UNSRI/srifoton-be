@@ -66,7 +66,7 @@ func (usecase adminUsecaseImpl) SendInvoice(ctx context.Context, id string) (err
 		}
 		team.Member2 = memberTwo
 	}
-	
+
 	if team.Member3.ID.Valid {
 		memberThree, err = usecase.memberRepository.FindByID(ctx, team.Member3.ID.String)
 		if err != nil {
