@@ -2,11 +2,12 @@ package http
 
 import (
 	"errors"
+	"log"
+	"net/http"
+
 	errorCommon "github.com/HMIF-UNSRI/srifoton-be/common/error"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
-	"log"
-	"net/http"
 )
 
 func MiddlewareErrorHandler() gin.HandlerFunc {
